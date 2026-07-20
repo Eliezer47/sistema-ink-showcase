@@ -1,4 +1,6 @@
 import DemoWorkspace from "./DemoWorkspace";
+import AuxiliaryViews from "./AuxiliaryViews";
+import BenefitsSection from "./BenefitsSection";
 
 export default function App() {
   return (
@@ -30,6 +32,10 @@ export default function App() {
       </section>
 
       <DemoWorkspace />
+
+      <AuxiliaryViews />
+
+      <BenefitsSection />
 
       <section className="trust-section" aria-labelledby="trust-title">
         <div>

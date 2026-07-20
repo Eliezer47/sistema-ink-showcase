@@ -8,14 +8,28 @@ Este repositorio muestra una recreación visual independiente con datos sintéti
 
 ## Qué incluye
 
-- Panel principal y prioridades operativas.
-- Ventas y seguimiento de pedidos.
-- Cola visual de producción.
-- Directorio ficticio de clientes.
-- Existencias y alertas ilustrativas.
-- Resumen financiero demostrativo.
+- Los 15 módulos visibles del menú actual: Panel principal, Métricas, Ventas, Caja,
+  Producción, Clientes, Cotizaciones, Control de entregas, Artículos del
+  cliente, Calidad, Finanzas, Compras, Inventario, Catálogo y Administración.
+- Pantallas ficticias diferenciadas para las siete opciones de Administración
+  y las cinco opciones de Catálogo, incluidas Métricas de ventas y Proveedores.
+- Una vista de Compras renovada, con indicadores de recepción, listado y detalle
+  visual; y la configuración diferenciada de impresión normal y térmica.
+- Cuatro vistas auxiliares independientes para conocer el acceso, la búsqueda y
+  selección de servidor, la configuración del PIN y el estado sin conexión.
+- Una sección comercial que explica las ventajas visibles del flujo integrado,
+  las métricas, la trazabilidad, el control de accesos y la continuidad operativa.
+- Una guía contextual integrada en la ventana de la demostración. Se adapta al
+  módulo activo y señala el menú, las subopciones, el área de trabajo y el
+  estado del entorno sin bloquear la navegación.
+- Datos, estados, importes, usuarios, equipos y referencias exclusivamente
+  sintéticos.
 
-La navegación entre módulos funciona únicamente en memoria. Los botones de escritura están deshabilitados y recargar la página restaura la vista inicial.
+La navegación entre módulos, subpantallas, vistas auxiliares y pasos de la guía funciona
+únicamente en memoria. La guía se abre desde el botón **Guía** de la barra
+superior y permanece dentro de la interfaz: no existe un carrusel explicativo
+automático. Los botones de escritura están deshabilitados y recargar la página
+restaura la vista inicial.
 
 ## Límites deliberados
 

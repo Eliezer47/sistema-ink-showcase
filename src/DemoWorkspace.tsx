@@ -81,11 +81,12 @@ function WindowButton({ children, danger = false, disabled = true, onClick, pres
   return <button ref={buttonRef} className={`titlebar-button${danger ? " danger" : ""}${pressed ? " active" : ""}`} type="button" disabled={disabled} onClick={onClick} aria-pressed={pressed} aria-controls={controls}>{children}</button>;
 }
 
-function ViewHeader({ title, subtitle, action }: { title: string; subtitle: string; action?: string }) {
+function ViewHeader({ title, subtitle, action, actions }: { title: string; subtitle: string; action?: string; actions?: readonly string[] }) {
+  const actionLabels = actions ?? (action ? [action] : []);
   return (
     <header className="real-view-header" data-guide-target="module-header">
       <div><h2>{title}</h2><p>{subtitle}</p></div>
-      {action ? <button className="real-secondary-button" type="button" disabled>{action}</button> : null}
+      {actionLabels.length ? <div className="real-view-actions">{actionLabels.map((label, index) => <button className={index === 0 && actions ? "real-primary-button" : "real-secondary-button"} key={label} type="button" disabled>{label}</button>)}</div> : null}
     </header>
   );
 }
@@ -238,7 +239,7 @@ function CashModule() {
   const orders = [["DEMO-1041", "Casa Nativa", "Pendiente", "16,300.00"], ["DEMO-1048", "Café Lumbre", "Abono", "5,720.00"], ["DEMO-1053", "Norte Creativo", "Pendiente", "8,950.00"]];
   return (
     <div className="real-module">
-      <ViewHeader title="Caja" subtitle="Cobros, transferencias pendientes y saldos de pedidos." action="Cierre diario" />
+      <ViewHeader title="Caja" subtitle="Cobros, transferencias pendientes y saldos de pedidos." actions={["Cerrar caja 20/07", "Retiro", "Cierre diario"]} />
       <div className="cash-summary" data-guide-target="module-metrics">
         <div><strong>CAJA ABIERTA</strong><small>Fondo demo C$ 5,000.00</small></div>
         <div><span>EFECTIVO ESPERADO</span><strong>C$ 26,420.00</strong></div>

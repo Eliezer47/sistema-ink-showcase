@@ -33,18 +33,25 @@ test("build contains the isolated Sistema Ink visual showcase", async () => {
   assert.match(javascript, /Compras abiertas/i);
   assert.match(javascript, /Valor por recibir/i);
   assert.match(javascript, /Inspeccionar y recibir/i);
-  assert.match(javascript, /Pantallas complementarias/i);
-  assert.match(javascript, /Inicio de sesión/i);
-  assert.match(javascript, /Buscar servidor/i);
+  assert.match(javascript, /Detalles que hacen más simple el trabajo diario/i);
+  assert.match(javascript, /Iniciar sesión/i);
+  assert.match(javascript, /Conectar con el servidor/i);
   assert.match(javascript, /Configurar PIN/i);
+  assert.match(javascript, /FORMATO NORMAL · CARTA \/ A4/i);
+  assert.match(javascript, /FORMATO BAUCHER · RECIBO TÉRMICO/i);
+  assert.match(javascript, /80 mm/i);
+  assert.match(javascript, /58 mm/i);
+  assert.match(javascript, /No válido como comprobante fiscal/i);
+  assert.match(javascript, /Pausar recorrido automático/i);
+  assert.match(javascript, /Reanudar recorrido automático/i);
   assert.match(javascript, /Sin comunicación con el servidor/i);
   assert.match(javascript, /Sin tráfico de red/i);
-  assert.match(javascript, /Una operación más clara, conectada y fácil de seguir/i);
-  assert.match(javascript, /Compras e inventario trazables/i);
-  assert.match(javascript, /Control por roles y respaldos/i);
-  assert.match(javascript, /La demostración utiliza datos ficticios y presenta únicamente el alcance visual del producto/i);
-  assert.doesNotMatch(javascript, /Entiende el flujo, módulo por módulo|aria-roledescription.{0,20}carrusel/i);
-  // Timer helpers are part of the bundled React scheduler. The source-level
-  // safety suite verifies that the showcase itself has no autoplay or timers.
+  assert.match(javascript, /Una herramienta pensada alrededor del trabajo real/i);
+  assert.match(javascript, /Todo el flujo conserva su contexto/i);
+  assert.match(javascript, /Impresión lista para cada estación/i);
+  assert.match(javascript, /Control sin perder continuidad/i);
+  assert.match(javascript, /Alcance visual con datos ficticios/i);
+  assert.match(javascript, /carrusel/i);
+  assert.doesNotMatch(javascript, /Entiende el flujo, módulo por módulo/i);
   assert.doesNotMatch(javascript, /localhost:5114|Bearer\s|SistemaInk\.Contracts/i);
 });

@@ -1,89 +1,47 @@
 type Benefit = {
   title: string;
   description: string;
-  evidence: string;
+  result: string;
 };
 
-const benefits: Benefit[] = [
+const benefits: readonly Benefit[] = [
   {
-    title: "Operación integrada",
-    description:
-      "Ventas, caja, producción, clientes y entregas comparten un mismo espacio visual para seguir el trabajo de principio a fin.",
-    evidence: "Ventas · Caja · Producción · Entregas",
+    title: "Todo el flujo conserva su contexto",
+    description: "Ventas, caja, producción, compras e inventario comparten la misma estructura visual y mantienen visible la información necesaria para continuar el trabajo.",
+    result: "Menos saltos entre registros y áreas.",
   },
   {
-    title: "Métricas para decidir",
-    description:
-      "Los paneles reúnen ventas, cobros, saldos, pendientes y comparativos para ofrecer una lectura clara de la operación.",
-    evidence: "Panel principal · Métricas comerciales",
+    title: "Impresión lista para cada estación",
+    description: "Los documentos Carta/A4 y los bauchers térmicos pueden salir por impresoras distintas, con prueba directa, vista previa y formatos de 58 u 80 mm.",
+    result: "Cada comprobante llega en el formato correcto.",
   },
   {
-    title: "Compras e inventario trazables",
-    description:
-      "Las vistas conectan proveedores, documentos de compra, recepción, existencias y movimientos para conservar el contexto de cada registro.",
-    evidence: "Compras · Proveedores · Inventario",
-  },
-  {
-    title: "Acceso y continuidad visibles",
-    description:
-      "El inicio de sesión, la búsqueda del servidor y el estado de los equipos ayudan a reconocer dónde conectarse y qué estaciones están disponibles.",
-    evidence: "Acceso · Servidor · Equipos conectados",
-  },
-  {
-    title: "Adaptado a cada puesto",
-    description:
-      "La empresa puede representar su moneda de trabajo y cada estación conserva opciones visuales para documentos, recibos e impresoras.",
-    evidence: "Empresa · Moneda · Estación e impresión",
-  },
-  {
-    title: "Control por roles y respaldos",
-    description:
-      "Usuarios, permisos e historial de respaldos hacen visibles las responsabilidades de acceso y las acciones de continuidad operativa.",
-    evidence: "Usuarios · Roles y permisos · Respaldos",
+    title: "Control sin perder continuidad",
+    description: "Usuarios, permisos, jornadas de caja, equipos conectados y respaldos ayudan a reconocer responsabilidades y el estado de la operación.",
+    result: "Más claridad para supervisar el día a día.",
   },
 ];
 
 export default function BenefitsSection() {
   return (
-    <section
-      className="benefits-section"
-      aria-labelledby="benefits-title"
-      aria-describedby="benefits-description"
-    >
+    <section className="benefits-section" aria-labelledby="benefits-title" aria-describedby="benefits-description">
       <header className="benefits-header">
-        <p className="benefits-eyebrow">VENTAJAS DEL SISTEMA</p>
-        <h2 className="benefits-title" id="benefits-title">
-          Una operación más clara, conectada y fácil de seguir
-        </h2>
-        <p className="benefits-description" id="benefits-description">
-          Sistema Ink reúne las áreas esenciales del negocio en una experiencia
-          visual coherente, desde el acceso inicial hasta el seguimiento y la
-          protección de la información.
-        </p>
+        <p className="benefits-eyebrow">POR QUÉ SISTEMA INK</p>
+        <h2 className="benefits-title" id="benefits-title">Una herramienta pensada alrededor del trabajo real.</h2>
+        <p className="benefits-description" id="benefits-description">La interfaz reúne operación, seguimiento e impresión sin exigir que cada área trabaje aislada.</p>
       </header>
 
-      <ul className="benefits-grid" aria-label="Principales ventajas de Sistema Ink">
-        {benefits.map((benefit, index) => (
-          <li className="benefits-card" key={benefit.title}>
-            <span className="benefits-number" aria-hidden="true">
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <div className="benefits-card-content">
-              <h3 className="benefits-card-title">{benefit.title}</h3>
-              <p className="benefits-card-description">{benefit.description}</p>
-              <p className="benefits-card-evidence">
-                <span className="benefits-card-evidence-label">Visible en:</span>{" "}
-                {benefit.evidence}
-              </p>
-            </div>
-          </li>
+      <div className="benefits-list" aria-label="Principales ventajas de Sistema Ink">
+        {benefits.map((benefit) => (
+          <article className="benefits-row" key={benefit.title}>
+            <h3>{benefit.title}</h3>
+            <p>{benefit.description}</p>
+            <strong>{benefit.result}</strong>
+          </article>
         ))}
-      </ul>
+      </div>
 
-      <p className="benefits-disclaimer">
-        La demostración utiliza datos ficticios y presenta únicamente el alcance
-        visual del producto.
-      </p>
+      <p className="benefits-disclaimer">Alcance visual con datos ficticios; las funciones operativas no forman parte de este repositorio público.</p>
     </section>
   );
 }

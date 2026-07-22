@@ -41,23 +41,12 @@ export default function App() {
         <div>
           <p className="eyebrow">Diseñada para mostrar, no para operar</p>
           <h2 id="trust-title">Una presentación pública con límites claros.</h2>
+          <p className="trust-intro">La demo permite evaluar la experiencia visual sin publicar el producto que la hace funcionar.</p>
         </div>
-        <div className="trust-grid">
-          <article>
-            <span className="trust-number">01</span>
-            <h3>Datos sintéticos</h3>
-            <p>Nombres, pedidos, importes y estados fueron creados exclusivamente para esta demostración.</p>
-          </article>
-          <article>
-            <span className="trust-number">02</span>
-            <h3>Solo presentación</h3>
-            <p>La navegación cambia de pantalla; guardar, cobrar, exportar y administrar permanecen deshabilitados.</p>
-          </article>
-          <article>
-            <span className="trust-number">03</span>
-            <h3>Producto protegido</h3>
-            <p>Este repositorio no contiene API, reglas comerciales, contratos, persistencia ni código del cliente real.</p>
-          </article>
+        <div className="trust-list">
+          <p><strong>Datos sintéticos.</strong> Nombres, pedidos, importes y estados fueron creados para esta presentación.</p>
+          <p><strong>Solo lectura.</strong> Guardar, cobrar, exportar, imprimir y administrar permanecen deshabilitados.</p>
+          <p><strong>Producto protegido.</strong> El repositorio no contiene API, base de datos ni reglas internas del sistema.</p>
         </div>
       </section>
 

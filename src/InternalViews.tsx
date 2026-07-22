@@ -82,15 +82,29 @@ function CompanyView() {
 
 function UsersView() {
   const rows: ReactNode[][] = [
-    [<strong>marina.demo</strong>, "Marina Soto", "Administración", <Badge tone="success">Activo</Badge>],
-    [<strong>leo.demo</strong>, "Leo Castillo", "Ventas", <Badge tone="success">Activo</Badge>],
-    [<strong>ana.demo</strong>, "Ana Vega", "Producción", <Badge tone="warning">Pausado</Badge>],
+    [<strong>marina.demo</strong>, "Marina Soto", "Administración", "Principal", <Badge tone="success">Activo</Badge>],
+    [<strong>leo.demo</strong>, "Leo Castillo", "Ventas", "Usuario", <Badge tone="success">Activo</Badge>],
+    [<strong>ana.demo</strong>, "Ana Vega", "Producción", "Usuario", <Badge tone="warning">Pausado</Badge>],
   ];
   return (
-    <Screen section="ADMINISTRACIÓN" title="Usuarios" description="Cuentas personales, estado de acceso y rol asignado.">
+    <Screen section="ADMINISTRACIÓN" title="Usuarios" description="Cuentas personales, nivel administrativo y rol asignado.">
       <div className="internal-screen-grid">
-        <section><div className="internal-list-actions"><DemoButton primary>Nuevo usuario</DemoButton><DemoButton>Cambiar estado</DemoButton><DemoButton>Restablecer clave</DemoButton></div><Table headers={["Usuario", "Nombre", "Rol", "Activo"]} rows={rows} selected={0} /></section>
-        <aside className="internal-card internal-editor" data-guide-target="record-detail"><h3>Datos del usuario</h3><p>Perfil demostrativo. No representa una cuenta real.</p><div className="internal-field-grid one-column"><Field label="Usuario" value="marina.demo" /><Field label="Nombre para mostrar" value="Marina Soto" /><Field label="Rol" value="Administración" /><Field label="Descripción del rol" value="Configuración general del entorno DEMO" /><Field label="Clave temporal" value="No disponible en la demostración" /></div><div className="internal-action-row"><DemoButton>Descartar</DemoButton><DemoButton>Asignar rol</DemoButton><DemoButton primary>Crear</DemoButton></div></aside>
+        <section>
+          <div className="internal-list-actions"><DemoButton primary>Nuevo usuario</DemoButton><DemoButton>Cambiar estado</DemoButton><DemoButton>Restablecer clave</DemoButton></div>
+          <Table headers={["Usuario", "Nombre", "Rol", "Nivel", "Activo"]} rows={rows} selected={0} />
+        </section>
+        <aside className="internal-card internal-editor" data-guide-target="record-detail">
+          <h3>Datos del usuario</h3>
+          <p>Perfil demostrativo. No representa una cuenta real.</p>
+          <div className="internal-field-grid one-column">
+            <Field label="Usuario" value="marina.demo" />
+            <Field label="Nombre para mostrar" value="Marina Soto" />
+            <Field label="Rol" value="Administración" />
+            <Field label="Código temporal" value="6 dígitos · un solo uso" />
+          </div>
+          <div className="user-security-note">El código temporal es distinto del PIN. El usuario crea su contraseña segura al ingresar y la cuenta principal permanece protegida.</div>
+          <div className="internal-action-row"><DemoButton>Descartar cambios</DemoButton><DemoButton primary>Guardar usuario</DemoButton></div>
+        </aside>
       </div>
     </Screen>
   );
@@ -154,10 +168,42 @@ function StationView() {
   return (
     <Screen section="ADMINISTRACIÓN" title="Estación e impresión" description="Preferencias locales de actualización y salidas impresas de esta estación.">
       <div className="settings-card-grid">
-        <section className="internal-card" data-guide-target="record-list"><div className="setting-title"><div><h3>Actualización entre equipos</h3><p className="internal-copy">Consulta periódica ilustrativa para mantener visible la operación compartida.</p></div><span className="fake-switch is-on" aria-hidden="true" /></div><div className="internal-field-grid one-column"><Field label="Intervalo" value="Configuración de demostración" /></div></section>
-        <section className="internal-card" data-guide-target="record-detail"><div className="setting-title"><div><h3>Impresoras predeterminadas</h3><p className="internal-copy">El diálogo de Windows seguirá disponible antes de imprimir.</p></div><DemoButton>Detectar impresoras</DemoButton></div><div className="printer-format-grid"><div><small>FORMATO NORMAL · CARTA / A4</small><p>Reportes, facturas y documentos administrativos.</p><Field label="Impresora para documentos normales" value="Impresora Oficina DEMO" /></div><div><small>FORMATO BAUCHER · RECIBO TÉRMICO</small><p>Recibos de caja y comprobantes compactos.</p><Field label="Impresora para recibos de caja" value="Térmica Caja DEMO" /></div></div><div className="printer-routing-note">El sistema preselecciona la impresora según el tipo de documento. Podrás cambiarla antes de confirmar la impresión.</div></section>
+        <section className="internal-card" data-guide-target="record-list">
+          <div className="setting-title">
+            <div><h3>Actualización entre equipos</h3><p className="internal-copy">Consulta periódica ilustrativa para mantener visible la operación compartida.</p></div>
+            <span className="fake-switch is-on" aria-hidden="true" />
+          </div>
+          <div className="internal-field-grid one-column"><Field label="Intervalo" value="Configuración de demostración" /></div>
+        </section>
+        <section className="internal-card station-print-card" data-guide-target="record-detail">
+          <div className="setting-title">
+            <div><h3>Impresoras predeterminadas</h3><p className="internal-copy">La prueba se envía directamente. Vista previa permite revisar, guardar PDF o elegir otra impresora.</p></div>
+            <DemoButton>Detectar impresoras</DemoButton>
+          </div>
+          <div className="printer-format-grid">
+            <section className="printer-format-panel">
+              <small>FORMATO NORMAL · CARTA / A4</small>
+              <p>Cotizaciones, ventas, cierres, constancias, listados y reportes.</p>
+              <Field label="Impresora para documentos normales" value="Impresora Oficina DEMO" />
+              <div className="printer-test-actions"><DemoButton primary>Imprimir prueba</DemoButton><DemoButton>Vista previa</DemoButton></div>
+            </section>
+            <section className="printer-format-panel thermal-format-panel">
+              <small>FORMATO BAUCHER · RECIBO TÉRMICO</small>
+              <p>Abonos, pagos totales y pagos combinados.</p>
+              <Field label="Impresora para recibos de caja" value="Térmica Caja DEMO" />
+              <div className="receipt-setting-grid">
+                <Field label="Método" value="Combinada · recomendada" />
+                <Field label="Papel" value="80 mm · 58 mm disponible" />
+                <Field label="Diseño" value="Logo · CAJA DEMO · mensaje final" />
+                <Field label="Salida compatible" value="Corte automático · cajón en efectivo" />
+              </div>
+              <div className="printer-test-actions"><DemoButton primary>Imprimir prueba</DemoButton><DemoButton>Vista previa</DemoButton></div>
+            </section>
+          </div>
+          <div className="printer-routing-note">Cada estación conserva sus propias impresoras y el sistema dirige cada documento al formato correspondiente.</div>
+        </section>
       </div>
-      <div className="internal-action-row station-actions"><DemoButton>Descartar</DemoButton><DemoButton primary>Guardar estación</DemoButton></div>
+      <div className="internal-action-row station-actions"><DemoButton>Descartar cambios</DemoButton><DemoButton primary>Guardar estación</DemoButton></div>
     </Screen>
   );
 }

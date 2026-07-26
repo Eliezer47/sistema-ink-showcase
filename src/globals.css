@@ -2250,7 +2250,7 @@ button:disabled {
   }
 }
 
-/* Visual parity with the current Sistema Ink desktop shell. */
+/* Visual parity with the current InkGestión desktop shell. */
 .demo-section {
   overflow-x: auto;
   width: calc(100% - 24px);

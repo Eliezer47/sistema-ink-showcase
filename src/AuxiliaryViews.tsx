@@ -224,7 +224,7 @@ function ReceiptPreview() {
             <hr />
             <p>Gracias por su compra</p>
             <small>No válido como comprobante fiscal</small>
-            <small>Sistema Ink · Datos ficticios</small>
+            <small>InkGestión · Datos ficticios</small>
           </div>
         </div>
       </div>
@@ -260,7 +260,7 @@ function ConnectionPreview() {
         </section>
       </div>
       <footer className="aux-connection-status">
-        <span><i aria-hidden="true" /> Conexión pausada</span><strong>Sistema Ink · Entorno de demostración</strong>
+        <span><i aria-hidden="true" /> Conexión pausada</span><strong>InkGestión · Entorno de demostración</strong>
       </footer>
     </article>
   );

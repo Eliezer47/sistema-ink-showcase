@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
-test("build contains the isolated Sistema Ink visual showcase", async () => {
+test("build contains the isolated InkGestión visual showcase", async () => {
   const html = await readFile(new URL("../dist/index.html", import.meta.url), "utf8");
-  assert.match(html, /<title>Sistema Ink \| Recorrido visual<\/title>/i);
+  assert.match(html, /<title>InkGestión \| Recorrido visual<\/title>/i);
   assert.match(html, /connect-src 'none'/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 

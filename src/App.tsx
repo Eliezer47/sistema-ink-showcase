@@ -16,8 +16,8 @@ export default function App() {
             <span> en una sola vista.</span>
           </h1>
           <p className="hero-lead">
-            Un recorrido visual por Sistema Ink, una solución de gestión para talleres de
-            personalización y producción ligera. Explora la interfaz con información
+            Un recorrido visual por InkGestión, una solución creada para ordenar la
+            operación de Ink Multiservicios. Explora la interfaz con información
             totalmente ficticia y sin conectarte al producto real.
           </p>
         </div>
@@ -52,7 +52,7 @@ export default function App() {
 
       <footer className="site-footer">
         <div>
-          <strong>Sistema Ink · Recorrido visual</strong>
+          <strong>InkGestión · Recorrido visual</strong>
           <p>Proyecto comercial de Eliezer Ponce.</p>
         </div>
         <div className="footer-links">

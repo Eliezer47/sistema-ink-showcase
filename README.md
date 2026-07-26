@@ -1,8 +1,8 @@
-# Sistema Ink — Showcase visual
+# InkGestión — Showcase visual
 
-![Portada del recorrido visual de Sistema Ink](public/og.png)
+![Portada del recorrido visual de InkGestión](public/og.png)
 
-Recorrido público y deliberadamente limitado de **Sistema Ink**, una aplicación de gestión para talleres de personalización y producción ligera.
+Recorrido público y deliberadamente limitado de **InkGestión**, una solución de gestión creada para Ink Multiservicios.
 
 Este repositorio muestra una recreación visual independiente con datos sintéticos. **No contiene el código del producto comercial**, sus reglas de negocio, API, contratos, base de datos, autenticación, instaladores ni documentación técnica interna.
 

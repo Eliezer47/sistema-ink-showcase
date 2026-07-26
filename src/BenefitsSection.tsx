@@ -26,12 +26,12 @@ export default function BenefitsSection() {
   return (
     <section className="benefits-section" aria-labelledby="benefits-title" aria-describedby="benefits-description">
       <header className="benefits-header">
-        <p className="benefits-eyebrow">POR QUÉ SISTEMA INK</p>
+        <p className="benefits-eyebrow">POR QUÉ INKGESTIÓN</p>
         <h2 className="benefits-title" id="benefits-title">Una herramienta pensada alrededor del trabajo real.</h2>
         <p className="benefits-description" id="benefits-description">La interfaz reúne operación, seguimiento e impresión sin exigir que cada área trabaje aislada.</p>
       </header>
 
-      <div className="benefits-list" aria-label="Principales ventajas de Sistema Ink">
+      <div className="benefits-list" aria-label="Principales ventajas de InkGestión">
         {benefits.map((benefit) => (
           <article className="benefits-row" key={benefit.title}>
             <h3>{benefit.title}</h3>

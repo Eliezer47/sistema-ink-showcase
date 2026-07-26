@@ -2,7 +2,7 @@
   "name": "sistema-ink-showcase",
   "version": "1.0.0",
   "private": true,
-  "description": "Recorrido visual aislado de Sistema Ink con datos ficticios.",
+  "description": "Recorrido visual aislado de InkGestión con datos ficticios.",
   "engines": {
     "node": ">=22.13.0"
   },

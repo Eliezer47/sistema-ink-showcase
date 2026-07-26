@@ -428,7 +428,7 @@ export default function DemoWorkspace() {
         <div className="read-only-pill"><span aria-hidden="true">●</span> Solo lectura · Datos ficticios</div>
       </div>
 
-      <div ref={workspaceRef} className="workspace real-workspace" tabIndex={-1} aria-label="Demostración visual de Sistema Ink">
+      <div ref={workspaceRef} className="workspace real-workspace" tabIndex={-1} aria-label="Demostración visual de InkGestión">
         <header className="app-titlebar real-titlebar">
           <span aria-hidden="true" />
           <strong>Atelier Demo</strong>
@@ -437,10 +437,10 @@ export default function DemoWorkspace() {
         </header>
 
         <aside className="app-sidebar real-sidebar">
-          <div className="company-identity"><div className="business-logo"><img src="./sistema-ink-icon.png" alt="Sistema Ink" /></div><strong>Atelier Demo</strong><small>Operación local</small></div>
+          <div className="company-identity"><div className="business-logo"><img src="./sistema-ink-icon.png" alt="InkGestión" /></div><strong>Atelier Demo</strong><small>Operación local</small></div>
           <div className="sidebar-scroll">
             <p className="nav-label">OPERACIÓN</p>
-            <nav aria-label="Menú visual de Sistema Ink" data-guide-target="shell-navigation">
+            <nav aria-label="Menú visual de InkGestión" data-guide-target="shell-navigation">
               {primaryModules.map((module) => renderNavButton(module))}
               <div className="more-navigation">
                 <button className="more-toggle" type="button" onClick={() => setMoreOpen((open) => !open)} aria-expanded={moreOpen} data-guide-target="more-options"><span aria-hidden="true">{moreOpen ? "▾" : "▸"}</span>MÁS OPCIONES</button>
@@ -454,7 +454,7 @@ export default function DemoWorkspace() {
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">Módulo visible: {moduleCopy[active].title}.</p>
         <section ref={contentRef} className={`app-content real-app-content${active === "administracion" || active === "catalogo" ? " internal-module-content" : ""}`} data-guide-target="module-surface" data-active-submenu={active === "administracion" ? administrationView : active === "catalogo" ? catalogView : undefined}><ModuleContent active={active} administrationView={administrationView} catalogView={catalogView} onAdministrationViewChange={showAdministrationView} onCatalogViewChange={showCatalogView} /></section>
 
-        <footer className="app-statusbar real-statusbar" data-guide-target="status-bar"><span><i /> Modo demostración · datos ficticios</span><strong>Sistema Ink · Recorrido visual aislado</strong></footer>
+        <footer className="app-statusbar real-statusbar" data-guide-target="status-bar"><span><i /> Modo demostración · datos ficticios</span><strong>InkGestión · Recorrido visual aislado</strong></footer>
         <InteractiveGuide active={active} open={guideOpen} onClose={closeGuide} workspaceRef={workspaceRef} />
       </div>
       <p className="demo-hint"><span aria-hidden="true">↖</span> El menú conserva la jerarquía visual del producto. Solo la navegación local está habilitada.</p>

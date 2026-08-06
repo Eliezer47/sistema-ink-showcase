@@ -65,3 +65,21 @@ test("build contains the isolated InkGestión visual laboratory", async () => {
   assert.doesNotMatch(javascript, /Entiende el flujo, módulo por módulo/i);
   assert.doesNotMatch(javascript, /localhost:5114|Bearer\s|SistemaInk\.Contracts/i);
 });
+
+test("build exposes a static Sites worker without application connectivity", async () => {
+  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
+  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
+  const { default: worker } = await import(workerUrl.href);
+
+  const response = await worker.fetch(
+    new Request("https://lab.example/ruta-interna"),
+    {
+      ASSETS: {
+        fetch: async (request) => new Response(new URL(request.url).pathname === "/index.html" ? "LAB SHELL" : "Not found", { status: new URL(request.url).pathname === "/index.html" ? 200 : 404 }),
+      },
+    },
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), "LAB SHELL");
+});

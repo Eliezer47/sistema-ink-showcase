@@ -9,7 +9,7 @@
   "packageManager": "pnpm@11.9.0",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/prepare-sites-build.mjs",
     "preview": "vite preview",
     "check:public": "node --test tests/public-safety.test.mjs",
     "test": "pnpm build && node --test tests/*.test.mjs"

@@ -3,15 +3,15 @@ import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
 test("build contains the isolated InkGestión visual laboratory", async () => {
-  const html = await readFile(new URL("../dist/index.html", import.meta.url), "utf8");
+  const html = await readFile(new URL("../dist/client/index.html", import.meta.url), "utf8");
   assert.match(html, /<title>InkGestión \| Laboratorio visual<\/title>/i);
   assert.match(html, /connect-src 'none'/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 
-  const assetNames = await readdir(new URL("../dist/assets/", import.meta.url));
+  const assetNames = await readdir(new URL("../dist/client/assets/", import.meta.url));
   const javascript = (
     await Promise.all(
-      assetNames.filter((name) => name.endsWith(".js")).map((name) => readFile(new URL(`../dist/assets/${name}`, import.meta.url), "utf8")),
+      assetNames.filter((name) => name.endsWith(".js")).map((name) => readFile(new URL(`../dist/client/assets/${name}`, import.meta.url), "utf8")),
     )
   ).join("\n");
 

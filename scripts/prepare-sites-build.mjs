@@ -1,4 +1,4 @@
-import { copyFile, mkdir, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readdir, rename, writeFile } from "node:fs/promises";
 
 const workerSource = `const worker = {
   async fetch(request, env) {
@@ -21,6 +21,13 @@ const workerSource = `const worker = {
 
 export default worker;
 `;
+
+await mkdir("dist/client", { recursive: true });
+const viteEntries = await readdir("dist", { withFileTypes: true });
+for (const entry of viteEntries) {
+  if (entry.name === "client") continue;
+  await rename(`dist/${entry.name}`, `dist/client/${entry.name}`);
+}
 
 await mkdir("dist/server", { recursive: true });
 await mkdir("dist/.openai", { recursive: true });

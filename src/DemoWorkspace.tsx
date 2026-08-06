@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useReducer, useRef, useState, type ReactNode, type RefObject } from "react";
 import InteractiveGuide, { type GuideModuleId } from "./InteractiveGuide";
 import InternalViewContent, { type AdministrationViewId, type CatalogViewId } from "./InternalViews";
+import LabModuleSurface from "./LabModuleSurface";
+import { createInitialLabState, labCycleReducer, type LabModuleId } from "./labCycle.js";
 
 type ModuleId = GuideModuleId;
 
 type ModuleDefinition = { id: ModuleId; label: string };
 type InternalViewId = AdministrationViewId | CatalogViewId;
 type InternalNavItem = { id: InternalViewId; label: string };
+type WorkspaceMode = "lab" | "showcase";
 
 const primaryModules: ModuleDefinition[] = [
   { id: "panel", label: "Panel principal" },
@@ -30,6 +33,12 @@ const secondaryModules: ModuleDefinition[] = [
   { id: "catalogo", label: "Catálogo" },
   { id: "administracion", label: "Administración" },
 ];
+
+const labModules = new Set<ModuleId>(["panel", "cotizaciones", "ventas", "caja", "produccion", "calidad", "entregas", "inventario", "finanzas"]);
+
+function isLabModule(id: ModuleId): id is LabModuleId {
+  return labModules.has(id);
+}
 
 const moduleCopy: Record<ModuleId, { title: string; subtitle: string }> = {
   panel: { title: "Panel principal", subtitle: "Pedidos pendientes y prioridades de la operación" },
@@ -381,6 +390,8 @@ export default function DemoWorkspace() {
   const [active, setActive] = useState<ModuleId>("panel");
   const [moreOpen, setMoreOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>("lab");
+  const [labState, dispatchLab] = useReducer(labCycleReducer, undefined, createInitialLabState);
   const [administrationView, setAdministrationView] = useState<AdministrationViewId>("empresa");
   const [catalogView, setCatalogView] = useState<CatalogViewId>("productos");
   const contentRef = useRef<HTMLElement>(null);
@@ -394,6 +405,16 @@ export default function DemoWorkspace() {
   const showModule = (id: ModuleId, secondary = false) => {
     setActive(id);
     setMoreOpen(secondary);
+  };
+
+  const showLabModule = (id: LabModuleId) => {
+    showModule(id, secondaryModules.some((module) => module.id === id));
+  };
+
+  const resetLab = () => {
+    dispatchLab({ type: "reset" });
+    setActive("panel");
+    setMoreOpen(false);
   };
 
   const resetInternalScroll = () => {
@@ -424,20 +445,21 @@ export default function DemoWorkspace() {
   return (
     <section className="demo-section" aria-labelledby="demo-title">
       <div className="demo-section-heading">
-        <div><p className="eyebrow">Recorrido fiel al entorno de escritorio</p><h2 id="demo-title">Explora el menú real con información ficticia.</h2></div>
-        <div className="read-only-pill"><span aria-hidden="true">●</span> Solo lectura · Datos ficticios</div>
+        <div><p className="eyebrow">Laboratorio funcional aislado</p><h2 id="demo-title">Completa un ciclo operativo con datos ficticios.</h2></div>
+        <div className={`read-only-pill${workspaceMode === "lab" ? " lab-active-pill" : ""}`}><span aria-hidden="true">●</span> {workspaceMode === "lab" ? "LAB activo · Reiniciable" : "Recorrido · Solo lectura"}</div>
       </div>
 
-      <div ref={workspaceRef} className="workspace real-workspace" tabIndex={-1} aria-label="Demostración visual de InkGestión">
+      <div ref={workspaceRef} className="workspace real-workspace" tabIndex={-1} aria-label="Laboratorio visual de InkGestión con datos ficticios">
         <header className="app-titlebar real-titlebar">
           <span aria-hidden="true" />
-          <strong>Atelier Demo</strong>
-          <div className="titlebar-tools"><span>Actualización automática</span><WindowButton buttonRef={guideButtonRef} controls="context-guide" disabled={false} onClick={() => setGuideOpen((open) => !open)} pressed={guideOpen}>Guía</WindowButton><WindowButton>Actualizar</WindowButton></div>
+          <strong>Atelier Demo {workspaceMode === "lab" ? "· LAB" : ""}</strong>
+          <div className="workspace-mode-switch" role="group" aria-label="Modo de la demostración"><button className={workspaceMode === "lab" ? "active" : ""} type="button" onClick={() => setWorkspaceMode("lab")} aria-pressed={workspaceMode === "lab"}>Modo LAB</button><button className={workspaceMode === "showcase" ? "active" : ""} type="button" onClick={() => setWorkspaceMode("showcase")} aria-pressed={workspaceMode === "showcase"}>Recorrido</button></div>
+          <div className="titlebar-tools"><WindowButton buttonRef={guideButtonRef} controls="context-guide" disabled={false} onClick={() => setGuideOpen((open) => !open)} pressed={guideOpen}>Guía</WindowButton>{workspaceMode === "lab" ? <WindowButton disabled={false} onClick={resetLab}>Reiniciar LAB</WindowButton> : <WindowButton>Actualizar</WindowButton>}</div>
           <div className="window-actions"><WindowButton>—</WindowButton><WindowButton>□</WindowButton><WindowButton danger>×</WindowButton></div>
         </header>
 
         <aside className="app-sidebar real-sidebar">
-          <div className="company-identity"><div className="business-logo"><img src="./sistema-ink-icon.png" alt="InkGestión" /></div><strong>Atelier Demo</strong><small>Operación local</small></div>
+          <div className="company-identity"><div className="business-logo"><img src="./sistema-ink-icon.png" alt="InkGestión" /></div><strong>Atelier Demo</strong><small>{workspaceMode === "lab" ? "Laboratorio local" : "Recorrido visual"}</small></div>
           <div className="sidebar-scroll">
             <p className="nav-label">OPERACIÓN</p>
             <nav aria-label="Menú visual de InkGestión" data-guide-target="shell-navigation">
@@ -452,12 +474,12 @@ export default function DemoWorkspace() {
         </aside>
 
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">Módulo visible: {moduleCopy[active].title}.</p>
-        <section ref={contentRef} className={`app-content real-app-content${active === "administracion" || active === "catalogo" ? " internal-module-content" : ""}`} data-guide-target="module-surface" data-active-submenu={active === "administracion" ? administrationView : active === "catalogo" ? catalogView : undefined}><ModuleContent active={active} administrationView={administrationView} catalogView={catalogView} onAdministrationViewChange={showAdministrationView} onCatalogViewChange={showCatalogView} /></section>
+        <section ref={contentRef} className={`app-content real-app-content${active === "administracion" || active === "catalogo" ? " internal-module-content" : ""}`} data-guide-target="module-surface" data-active-submenu={active === "administracion" ? administrationView : active === "catalogo" ? catalogView : undefined}>{workspaceMode === "lab" && isLabModule(active) ? <LabModuleSurface active={active} state={labState} dispatch={dispatchLab} onNavigate={showLabModule} /> : <ModuleContent active={active} administrationView={administrationView} catalogView={catalogView} onAdministrationViewChange={showAdministrationView} onCatalogViewChange={showCatalogView} />}</section>
 
-        <footer className="app-statusbar real-statusbar" data-guide-target="status-bar"><span><i /> Modo demostración · datos ficticios</span><strong>InkGestión · Recorrido visual aislado</strong></footer>
+        <footer className="app-statusbar real-statusbar" data-guide-target="status-bar"><span><i /> {workspaceMode === "lab" ? "Modo LAB · estado temporal" : "Modo demostración · datos ficticios"}</span><strong>InkGestión · Sin conexión al producto real</strong></footer>
         <InteractiveGuide active={active} open={guideOpen} onClose={closeGuide} workspaceRef={workspaceRef} />
       </div>
-      <p className="demo-hint"><span aria-hidden="true">↖</span> El menú conserva la jerarquía visual del producto. Solo la navegación local está habilitada.</p>
+      <p className="demo-hint"><span aria-hidden="true">↖</span> Sigue el paso indicado por el LAB. Reiniciar restaura la cotización, los saldos y el inventario ficticio.</p>
     </section>
   );
 }

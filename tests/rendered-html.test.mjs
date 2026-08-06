@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
-test("build contains the isolated InkGestión visual showcase", async () => {
+test("build contains the isolated InkGestión visual laboratory", async () => {
   const html = await readFile(new URL("../dist/index.html", import.meta.url), "utf8");
-  assert.match(html, /<title>InkGestión \| Recorrido visual<\/title>/i);
+  assert.match(html, /<title>InkGestión \| Laboratorio visual<\/title>/i);
   assert.match(html, /connect-src 'none'/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 
@@ -16,6 +16,16 @@ test("build contains the isolated InkGestión visual showcase", async () => {
   ).join("\n");
 
   assert.match(javascript, /Demo visual aislada/i);
+  assert.match(javascript, /MODO LAB OPERATIVO/i);
+  assert.match(javascript, /Aprobar cotización/i);
+  assert.match(javascript, /Convertir en pedido/i);
+  assert.match(javascript, /Registrar anticipo/i);
+  assert.match(javascript, /Iniciar producción/i);
+  assert.match(javascript, /Aprobar calidad/i);
+  assert.match(javascript, /Registrar entrega/i);
+  assert.match(javascript, /Cobrar saldo/i);
+  assert.match(javascript, /Reiniciar LAB/i);
+  assert.match(javascript, /Ciclo completado/i);
   assert.match(javascript, /Datos ficticios/i);
   assert.match(javascript, /Panel principal/i);
   assert.match(javascript, /Métricas/i);

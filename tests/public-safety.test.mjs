@@ -312,3 +312,30 @@ test("explains product benefits while preserving the public-demo boundary", () =
   assert.match(benefits, /aria-labelledby="benefits-title"/u);
   assert.match(benefits, /aria-describedby="benefits-description"/u);
 });
+
+test("provides a resettable in-memory LAB cycle across the public modules", () => {
+  const workspace = readFileSync("src/DemoWorkspace.tsx", "utf8");
+  const labSurface = readFileSync("src/LabModuleSurface.tsx", "utf8");
+  const labCycle = readFileSync("src/labCycle.js", "utf8");
+
+  assert.match(workspace, /useReducer\(labCycleReducer/u);
+  assert.match(workspace, /useState<WorkspaceMode>\("lab"\)/u);
+  assert.match(workspace, /Reiniciar LAB/u);
+  assert.match(workspace, /<LabModuleSurface/u);
+
+  for (const label of [
+    "Aprobar cotización", "Convertir en pedido", "Registrar anticipo",
+    "Iniciar producción", "Finalizar producción", "Aprobar calidad",
+    "Registrar entrega", "Cobrar saldo", "Ciclo completado",
+  ]) {
+    assert.match(`${labSurface}\n${labCycle}`, new RegExp(label, "u"), `Missing LAB operation: ${label}`);
+  }
+
+  for (const moduleId of ["cotizaciones", "ventas", "caja", "produccion", "calidad", "entregas", "inventario", "finanzas"]) {
+    assert.match(labSurface, new RegExp(`active === ["']${moduleId}["']`, "u"), `Missing LAB module surface: ${moduleId}`);
+  }
+
+  assert.match(labCycle, /compras@cafenube\.example/u);
+  assert.match(labCycle, /if \(action\.type === "reset"\) return createInitialLabState\(\)/u);
+  assert.doesNotMatch(`${workspace}\n${labSurface}\n${labCycle}`, /fetch\s*\(|XMLHttpRequest|WebSocket|EventSource|sendBeacon|localStorage|sessionStorage/u);
+});

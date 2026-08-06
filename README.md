@@ -1,8 +1,8 @@
-# InkGestión — Showcase visual
+# InkGestión — Showcase y laboratorio visual
 
 ![Portada del recorrido visual de InkGestión](public/og.png)
 
-Recorrido público y deliberadamente limitado de **InkGestión**, una solución de gestión creada para Ink Multiservicios.
+Recorrido público y laboratorio funcional deliberadamente limitado de **InkGestión**, una solución de gestión creada para Ink Multiservicios.
 
 Este repositorio muestra una recreación visual independiente con datos sintéticos. **No contiene el código del producto comercial**, sus reglas de negocio, API, contratos, base de datos, autenticación, instaladores ni documentación técnica interna.
 
@@ -11,6 +11,11 @@ Este repositorio muestra una recreación visual independiente con datos sintéti
 - Los 15 módulos visibles del menú actual: Panel principal, Métricas, Ventas, Caja,
   Producción, Clientes, Cotizaciones, Control de entregas, Artículos del
   cliente, Calidad, Finanzas, Compras, Inventario, Catálogo y Administración.
+- Un **Modo LAB** reiniciable que simula un ciclo completo: aprobación de
+  cotización, creación del pedido, anticipo, producción, control de calidad,
+  entrega y cobro final.
+- Impacto visual coordinado en Caja, Inventario y Finanzas a medida que avanza
+  el pedido ficticio, con una bitácora determinista del escenario.
 - Pantallas ficticias diferenciadas para las siete opciones de Administración
   y las cinco opciones de Catálogo, incluidas Métricas de ventas y Proveedores.
 - Una vista de Compras con indicadores de recepción, listado y detalle visual.
@@ -31,14 +36,27 @@ en memoria. La guía se abre desde el botón **Guía** de la barra superior y
 permanece dentro de la interfaz. Las vistas complementarias avanzan cada ocho
 segundos y pueden pausarse; también se detienen al enfocarlas, al colocar el
 puntero encima, al salir de la ventana visible o cuando el sistema solicita
-movimiento reducido. Los botones operativos están deshabilitados y recargar la
-página restaura la vista inicial.
+movimiento reducido. En **Recorrido** los controles operativos permanecen
+deshabilitados. En **Modo LAB** solo se habilita la siguiente acción válida del
+escenario y recargar la página restaura el estado inicial.
+
+## Uso del Modo LAB
+
+El laboratorio inicia con `COT-DEMO-0201`, una cotización sintética para
+`Café Nube Demo`. La franja superior indica el paso actual y conduce al módulo
+correspondiente. Cada acción actualiza únicamente el estado temporal de la
+página; las operaciones fuera de orden se rechazan.
+
+El botón **Reiniciar LAB** restaura la cotización, la bitácora, los saldos y las
+existencias ficticias. El selector **Recorrido** conserva la presentación visual
+anterior para explorar los demás módulos sin ejecutar el escenario.
 
 ## Límites deliberados
 
 - Sin conexión a servicios del producto comercial.
 - Sin base de datos, cuentas, autenticación, telemetría o almacenamiento del navegador.
-- Sin acciones de guardar, cobrar, exportar, restaurar o administrar.
+- Sin acciones reales de guardar, cobrar, exportar, restaurar o administrar;
+  las acciones del LAB son transiciones visuales en memoria.
 - Sin datos tomados de personas, empresas, pedidos o instalaciones reales.
 - Sin código XAML, .NET, SQL, contratos, endpoints o binarios del producto.
 

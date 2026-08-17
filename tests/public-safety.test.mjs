@@ -111,8 +111,10 @@ test("provides distinct internal screens and an accessible contextual guide", ()
   const css = readFileSync("src/globals.css", "utf8");
 
   for (const view of [
-    "Empresa", "Usuarios", "Roles y permisos", "Equipos conectados",
+    "Empresa", "Usuarios", "Roles y permisos", "Cajas físicas", "Auditoría",
+    "Equipos conectados",
     "Métricas de ventas", "Estación e impresión", "Respaldos y diagnóstico",
+    "Puesta en marcha",
     "Productos y servicios", "Categorías", "Unidades", "Recetas y costos", "Proveedores",
   ]) {
     assert.match(internalViews, new RegExp(view, "u"), `Missing internal demo screen: ${view}`);
@@ -130,7 +132,7 @@ test("provides distinct internal screens and an accessible contextual guide", ()
   assert.match(workspace, /aria-current=\{activeInternal === item\.id \? "page"/u);
   assert.match(workspace, /resetInternalScroll/u);
   assert.match(workspace, /internal-view-host/u);
-  for (const viewId of ["empresa", "usuarios", "roles", "equipos", "metricas-ventas", "estacion", "respaldos"]) {
+  for (const viewId of ["empresa", "usuarios", "roles", "cajas", "auditoria", "equipos", "metricas-ventas", "estacion", "respaldos", "puesta-marcha"]) {
     assert.match(internalViews, new RegExp(`case ["']${viewId}["']`, "u"), `Missing explicit Administration dispatch: ${viewId}`);
   }
   for (const viewId of ["productos", "categorias", "unidades", "recetas", "proveedores"]) {
@@ -177,7 +179,7 @@ test("includes the current metrics and purchases presentation as read-only synth
   const internalViews = readFileSync("src/InternalViews.tsx", "utf8");
 
   for (const label of [
-    "Ventas del mes", "Cobrado", "Gastos registrados", "Utilidad bruta est.", "Por cobrar",
+    "Ventas del mes", "Cobrado", "Gastos registrados", "Resultado operativo", "Por cobrar",
     "Ventas por semana", "Productos y servicios líderes", "Gastos por categoría",
   ]) {
     assert.match(workspace, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "iu"), `Missing executive metric: ${label}`);
@@ -209,7 +211,7 @@ test("reflects the latest sales-relevant desktop changes without technical print
   const auxiliary = readFileSync("src/AuxiliaryViews.tsx", "utf8");
   const presentation = internalViews + "\n" + auxiliary;
 
-  for (const cashLabel of ["Cerrar caja 20/07", "Retiro", "Cierre diario"]) {
+  for (const cashLabel of ["Historial y conciliación", "Retiro", "Cierre diario"]) {
     assert.match(workspace, new RegExp(cashLabel, "u"));
   }
 
@@ -223,6 +225,35 @@ test("reflects the latest sales-relevant desktop changes without technical print
   }
 
   assert.doesNotMatch(presentation, /CP850|CP858|GS_V0|GS_L|ESC_STAR|COMBINED_ESC_POS|WINDOWS_1252/u);
+});
+
+test("reflects the current operational and workstation surfaces with synthetic data", () => {
+  const workspace = readFileSync("src/DemoWorkspace.tsx", "utf8");
+  const internalViews = readFileSync("src/InternalViews.tsx", "utf8");
+  const labSurface = readFileSync("src/LabModuleSurface.tsx", "utf8");
+  const labCycle = readFileSync("src/labCycle.js", "utf8");
+  const source = `${workspace}\n${internalViews}\n${labSurface}\n${labCycle}`;
+
+  for (const label of [
+    "Cajas físicas", "Historial y conciliación", "Caja Taller DEMO",
+    "Auditoría", "Puesta en marcha", "Situación comercial del cliente",
+    "Saldo a favor", "Cambiar fecha", "Agregar conceptos", "Cancelar conceptos",
+    "Conciliación bancaria", "Resultado operativo", "Cuenta / reserva",
+    "EDITOR SIMPLE DE ETIQUETA", "Etiqueta compacta 40 × 30 mm",
+    "Vista previa integrada", "Impresión preseleccionada",
+  ]) {
+    assert.match(source, new RegExp(label, "iu"), `Missing current synthetic surface: ${label}`);
+  }
+
+  for (const label of [
+    "Preparar despacho", "Revisar comprobante", "REC-DEMO-0201",
+  ]) {
+    assert.match(`${labSurface}\n${labCycle}`, new RegExp(label, "u"), `Missing current LAB operation: ${label}`);
+  }
+
+  assert.match(labCycle, /customerCreditAmount:\s*1000/u);
+  assert.doesNotMatch(source, /CP850|CP858|GS_V0|GS_L|ESC_STAR|COMBINED_ESC_POS|WINDOWS_1252/u);
+  assert.doesNotMatch(source, /fetch\s*\(|XMLHttpRequest|WebSocket|localStorage|sessionStorage/u);
 });
 
 test("provides an accessible self-advancing feature carousel without product connectivity", () => {
@@ -326,7 +357,8 @@ test("provides a resettable in-memory LAB cycle across the public modules", () =
   for (const label of [
     "Aprobar cotización", "Convertir en pedido", "Registrar anticipo",
     "Iniciar producción", "Finalizar producción", "Aprobar calidad",
-    "Registrar entrega", "Cobrar saldo", "Ciclo completado",
+    "Preparar despacho", "Registrar entrega", "Cobrar saldo",
+    "Revisar comprobante", "Ciclo completado",
   ]) {
     assert.match(`${labSurface}\n${labCycle}`, new RegExp(label, "u"), `Missing LAB operation: ${label}`);
   }

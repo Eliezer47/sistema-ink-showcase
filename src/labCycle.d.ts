@@ -6,7 +6,9 @@ export type LabStageId =
   | "production_active"
   | "quality_pending"
   | "delivery_ready"
+  | "dispatch_prepared"
   | "balance_due"
+  | "receipt_ready"
   | "completed";
 
 export type LabActionType =
@@ -16,8 +18,10 @@ export type LabActionType =
   | "start_production"
   | "finish_production"
   | "approve_quality"
+  | "prepare_dispatch"
   | "register_delivery"
   | "settle_balance"
+  | "review_receipt"
   | "reset";
 
 export type LabModuleId =
@@ -69,6 +73,7 @@ export interface LabScenario {
   materials: ReadonlyArray<LabMaterial>;
   totalAmount: number;
   depositAmount: number;
+  customerCreditAmount: number;
   deliveryDate: string;
 }
 
@@ -78,6 +83,9 @@ export interface LabSnapshot {
   progressPercent: number;
   paidAmount: number;
   balanceAmount: number;
+  customerCreditApplied: number;
+  receiptStatus: string;
+  shippingLabelStatus: string;
   inventoryMovements: number;
   materials: Array<LabMaterial & { available: number; committed: number }>;
   orderStatus: string;

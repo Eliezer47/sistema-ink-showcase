@@ -6,7 +6,12 @@ test("build contains the isolated InkGestión visual laboratory", async () => {
   const html = await readFile(new URL("../dist/client/index.html", import.meta.url), "utf8");
   assert.match(html, /<title>InkGestión \| Laboratorio visual<\/title>/i);
   assert.match(html, /connect-src 'none'/i);
+  assert.match(html, /property="og:title" content="InkGestión · Laboratorio visual"/i);
+  assert.match(html, /og-v3\.png/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
+
+  const socialPreview = await readFile(new URL("../dist/client/og-v3.png", import.meta.url));
+  assert.ok(socialPreview.byteLength > 100_000);
 
   const assetNames = await readdir(new URL("../dist/client/assets/", import.meta.url));
   const javascript = (
@@ -22,8 +27,10 @@ test("build contains the isolated InkGestión visual laboratory", async () => {
   assert.match(javascript, /Registrar anticipo/i);
   assert.match(javascript, /Iniciar producción/i);
   assert.match(javascript, /Aprobar calidad/i);
+  assert.match(javascript, /Preparar despacho/i);
   assert.match(javascript, /Registrar entrega/i);
   assert.match(javascript, /Cobrar saldo/i);
+  assert.match(javascript, /Revisar comprobante/i);
   assert.match(javascript, /Reiniciar LAB/i);
   assert.match(javascript, /Ciclo completado/i);
   assert.match(javascript, /Datos ficticios/i);
@@ -40,6 +47,9 @@ test("build contains the isolated InkGestión visual laboratory", async () => {
   assert.match(javascript, /Proveedores/i);
   assert.match(javascript, /Métricas de ventas/i);
   assert.match(javascript, /Respaldos y diagnóstico/i);
+  assert.match(javascript, /Cajas físicas/i);
+  assert.match(javascript, /Auditoría/i);
+  assert.match(javascript, /Puesta en marcha/i);
   assert.match(javascript, /Compras abiertas/i);
   assert.match(javascript, /Valor por recibir/i);
   assert.match(javascript, /Inspeccionar y recibir/i);

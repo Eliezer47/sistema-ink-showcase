@@ -15,8 +15,10 @@ const fullCycleActions = [
   "start_production",
   "finish_production",
   "approve_quality",
+  "prepare_dispatch",
   "register_delivery",
   "settle_balance",
+  "review_receipt",
 ];
 
 test("starts with a deterministic synthetic quote and no financial or stock impact", () => {
@@ -44,6 +46,9 @@ test("runs the complete operational cycle and updates its derived ledgers", () =
   assert.equal(snapshot.progressPercent, 100);
   assert.equal(snapshot.paidAmount, LAB_SCENARIO.totalAmount);
   assert.equal(snapshot.balanceAmount, 0);
+  assert.equal(snapshot.customerCreditApplied, LAB_SCENARIO.customerCreditAmount);
+  assert.equal(snapshot.receiptStatus, "Revisado");
+  assert.equal(snapshot.shippingLabelStatus, "Preparada");
   assert.equal(snapshot.inventoryMovements, LAB_SCENARIO.materials.length);
   assert.ok(snapshot.materials.every((material) => material.available < material.initial));
 });

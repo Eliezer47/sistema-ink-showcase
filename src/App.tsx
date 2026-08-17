@@ -17,8 +17,8 @@ export default function App() {
           </h1>
           <p className="hero-lead">
             Recorre InkGestión y completa una operación simulada desde la cotización
-            hasta el cobro final. Todo sucede con información ficticia, en memoria y
-            sin conectarte al producto real.
+            hasta el despacho, cobro y revisión del comprobante. Todo sucede con
+            información ficticia, en memoria y sin conectarte al producto real.
           </p>
           <div className="hero-actions"><a className="hero-lab-link" href="#demo-title">Iniciar ciclo LAB</a><span>Escenario reiniciable · sin registro</span></div>
         </div>
@@ -46,7 +46,7 @@ export default function App() {
         </div>
         <div className="trust-list">
           <p><strong>Datos sintéticos.</strong> Nombres, pedidos, importes y estados fueron creados para esta presentación.</p>
-          <p><strong>Operación acotada.</strong> Cotizar, producir, revisar, entregar y cobrar solo modifican el escenario temporal.</p>
+          <p><strong>Operación acotada.</strong> Cotizar, producir, preparar el despacho, entregar y cobrar solo modifican el escenario temporal.</p>
           <p><strong>Producto protegido.</strong> El repositorio no contiene API, base de datos ni reglas internas del sistema.</p>
         </div>
       </section>

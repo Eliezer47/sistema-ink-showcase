@@ -12,12 +12,12 @@ const benefits: readonly Benefit[] = [
   },
   {
     title: "Impresión lista para cada estación",
-    description: "Los documentos Carta/A4 y los bauchers térmicos pueden salir por impresoras distintas, con prueba directa, vista previa y formatos de 58 u 80 mm.",
-    result: "Cada comprobante llega en el formato correcto.",
+    description: "Documentos Carta/A4, etiquetas de despacho y bauchers térmicos pueden usar perfiles distintos, con editor simple, prueba y vista previa en formatos de 58 u 80 mm.",
+    result: "Cada documento conserva el perfil de su estación.",
   },
   {
     title: "Control sin perder continuidad",
-    description: "Usuarios, permisos, jornadas de caja, equipos conectados y respaldos ayudan a reconocer responsabilidades y el estado de la operación.",
+    description: "Usuarios, permisos, cajas físicas compartidas, auditoría, equipos conectados y respaldos ayudan a reconocer responsabilidades y el estado de la operación.",
     result: "Más claridad para supervisar el día a día.",
   },
 ];

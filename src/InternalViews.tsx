@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export type AdministrationViewId = "empresa" | "usuarios" | "roles" | "equipos" | "metricas-ventas" | "estacion" | "respaldos";
+export type AdministrationViewId = "empresa" | "usuarios" | "roles" | "cajas" | "auditoria" | "equipos" | "metricas-ventas" | "estacion" | "respaldos" | "puesta-marcha";
 export type CatalogViewId = "productos" | "categorias" | "unidades" | "recetas" | "proveedores";
 
 type Metric = {
@@ -126,6 +126,42 @@ function RolesView() {
   );
 }
 
+function CashRegistersView() {
+  const rows: ReactNode[][] = [
+    [<strong>CAJ-DEMO-01</strong>, "Caja Taller DEMO", "Marina Soto · Leo Castillo", "C$ 8,420", <Badge tone="success">Abierta</Badge>],
+    [<strong>CAJ-DEMO-02</strong>, "Caja Entregas DEMO", "Ana Vega", "C$ 0", <Badge>Disponible</Badge>],
+  ];
+  return (
+    <Screen section="ADMINISTRACIÓN" title="Cajas físicas" description="Fondos compartidos, usuarios asignados y custodia independiente." action="Nueva caja" metrics={[{ label: "Cajas activas", value: "2", tone: "success" }, { label: "Abiertas ahora", value: "1", tone: "warning" }, { label: "Usuarios asignados", value: "3" }]}>
+      <div className="internal-screen-grid cash-register-grid">
+        <section><Table headers={["Código", "Caja", "Usuarios", "Efectivo DEMO", "Estado"]} rows={rows} selected={0} /></section>
+        <aside className="internal-card internal-editor" data-guide-target="record-detail">
+          <div className="internal-card-heading"><div><h3>Caja Taller DEMO</h3><p className="internal-copy">Cajón ficticio compartido por turnos.</p></div><Badge tone="success">Activa</Badge></div>
+          <div className="internal-field-grid"><Field label="Código" value="CAJ-DEMO-01" /><Field label="Estado" value="Abierta" /><Field label="Custodia" value="Fondo compartido" wide /></div>
+          <h4 className="permission-heading">Usuarios asignados</h4>
+          <div className="cash-register-users"><div><strong>Marina Soto</strong><span>Administración demo</span></div><div><strong>Leo Castillo</strong><span>Ventas demo</span></div></div>
+          <div className="user-security-note">La caja representa el dinero físico, no el equipo ni la cuenta del usuario. Esta vista no cambia fondos reales.</div>
+          <div className="internal-action-row"><DemoButton>Desactivar</DemoButton><DemoButton primary>Guardar caja</DemoButton></div>
+        </aside>
+      </div>
+    </Screen>
+  );
+}
+
+function AuditView() {
+  const rows: ReactNode[][] = [
+    ["17/08/2026 09:18", "Marina Soto", "Caja", "Cobro registrado", "REC-DEMO-0201", "Caja Taller DEMO"],
+    ["17/08/2026 08:54", "Leo Castillo", "Pedidos", "Fecha modificada", "PED-DEMO-0198", "—"],
+    ["16/08/2026 17:40", "Marina Soto", "Administración", "Caja actualizada", "CAJ-DEMO-01", "Caja Taller DEMO"],
+  ];
+  return (
+    <Screen section="ADMINISTRACIÓN" title="Auditoría" description="Consulta de acciones, referencias y cambios visibles para administradores." action="Actualizar" metrics={[{ label: "Eventos del período", value: "27" }, { label: "Áreas con actividad", value: "5" }, { label: "Datos protegidos", value: "Sí", tone: "success" }]}>
+      <section className="audit-filter-card" data-guide-target="module-filter"><Field label="Período" value="Últimos 7 días · DEMO" /><Field label="Usuario" value="Todos" /><Field label="Área" value="Todas" /><Field label="Caja física" value="Todas" /><Field label="Buscar" value="Referencia o acción…" /></section>
+      <section className="internal-card audit-table-card" data-guide-target="record-detail"><Table headers={["Fecha y hora", "Usuario", "Área", "Acción", "Referencia", "Caja"]} rows={rows} selected={0} /><div className="audit-change-preview"><small>CAMBIO SELECCIONADO</small><strong>Antes: fecha prometida ficticia</strong><span>Después: nueva fecha DEMO · Motivo registrado</span></div></section>
+    </Screen>
+  );
+}
+
 function DevicesView() {
   const rows: ReactNode[][] = [
     [<Badge tone="success">En línea</Badge>, <strong>ESTACIÓN-DEMO-01</strong>, "Marina Soto", "DEMO", "192.0.2.10", "08:42", "Hace unos segundos", "Windows"],
@@ -199,6 +235,17 @@ function StationView() {
               </div>
               <div className="printer-test-actions"><DemoButton primary>Imprimir prueba</DemoButton><DemoButton>Vista previa</DemoButton></div>
             </section>
+            <section className="printer-format-panel label-format-panel">
+              <small>FORMATO ETIQUETA · PERFIL DE ESTA ESTACIÓN</small>
+              <p>Ventas usa este perfil para el despacho y permite revisarlo antes de imprimir.</p>
+              <div className="label-profile-heading"><Field label="Tamaño predeterminado" value="Etiqueta compacta 40 × 30 mm" /><Badge tone="success">300 DPI · DEMO</Badge></div>
+              <div className="receipt-setting-grid">
+                <Field label="Diseño / orientación" value="Datos esenciales · horizontal" />
+                <Field label="Papel alternativo" value="4 × 6 · 80 mm · 58 mm" />
+              </div>
+              <div className="simple-label-editor"><strong>EDITOR SIMPLE DE ETIQUETA</strong><span>Encabezado</span><b>100 %</b><span>Nombre del cliente</span><b>140 %</b><span>Teléfono</span><b>110 %</b><span>Ubicación</span><b>100 %</b><span>N.º de pedido</span><b>120 %</b></div>
+              <div className="printer-test-actions"><DemoButton primary>Imprimir prueba</DemoButton><DemoButton>Vista previa</DemoButton></div>
+            </section>
           </div>
           <div className="printer-routing-note">Cada estación conserva sus propias impresoras y el sistema dirige cada documento al formato correspondiente.</div>
         </section>
@@ -219,6 +266,25 @@ function BackupsView() {
       <section className="internal-card backup-schedule" data-guide-target="record-detail"><div className="setting-title"><div><h3>Programación automática</h3><p className="internal-copy">Próxima ejecución: horario sintético de demostración.</p></div><span className="fake-switch is-on" aria-hidden="true" /></div><div className="internal-field-grid"><Field label="Frecuencia" value="Programada" /><Field label="Hora" value="Configuración demo" /><Field label="Día" value="Periodo ilustrativo" /><Field label="Retención" value="Historial ficticio" /></div><div className="internal-action-row"><DemoButton>Descartar</DemoButton><DemoButton primary>Guardar programación</DemoButton></div></section>
       <div className="backup-action-grid"><section className="internal-card"><h3>Respaldo manual</h3><p className="internal-copy">Crea una copia de muestra en el almacenamiento configurado.</p><DemoButton primary>Crear respaldo</DemoButton></section><section className="internal-card"><h3>Restaurar respaldo</h3><p className="internal-copy">Esta acción permanece deshabilitada en la presentación pública.</p><DemoButton>Seleccionar archivo…</DemoButton></section></div>
       <section className="internal-card backup-history"><div className="internal-card-heading"><div><h3>Historial</h3><p className="internal-copy">La tabla usa únicamente archivos y estados ficticios.</p></div></div><Table headers={["Inicio", "Origen", "Estado", "Tamaño", "Detalle"]} rows={rows} /></section>
+    </Screen>
+  );
+}
+
+function GettingStartedView() {
+  const steps = [
+    ["1", "Empresa y moneda", "Completo"],
+    ["2", "Usuarios y permisos", "Completo"],
+    ["3", "Cajas físicas", "Completo"],
+    ["4", "Estación e impresión", "En revisión"],
+    ["5", "Catálogo y recetas", "Pendiente"],
+    ["6", "Clientes y precios", "Pendiente"],
+  ];
+  return (
+    <Screen section="ADMINISTRACIÓN" title="Puesta en marcha" description="Tutorial guiado de 11 pasos adaptado a las opciones disponibles." metrics={[{ label: "Avance DEMO", value: "4 de 11", tone: "warning" }, { label: "Configuración base", value: "Preparada", tone: "success" }, { label: "Datos reales", value: "No usados" }]}>
+      <div className="getting-started-layout">
+        <section className="internal-card getting-started-list" data-guide-target="record-list"><h3>Ruta recomendada</h3>{steps.map(([number, label, status]) => <div className={status === "Completo" ? "is-done" : status === "En revisión" ? "is-current" : ""} key={number}><span>{status === "Completo" ? "✓" : number}</span><strong>{label}</strong><small>{status}</small></div>)}</section>
+        <aside className="internal-card internal-editor" data-guide-target="record-detail"><small>PASO 4 DE 11</small><h3>Revisa esta estación</h3><p>Confirma impresoras, formatos de documentos, etiqueta de envío y recibo térmico antes de operar.</p><div className="internal-field-grid one-column"><Field label="Documento normal" value="Impresora Oficina DEMO" /><Field label="Etiqueta" value="40 × 30 mm · DEMO" /><Field label="Recibo" value="Térmica Caja DEMO" /></div><div className="internal-action-row"><DemoButton>Anterior</DemoButton><DemoButton primary>Siguiente</DemoButton></div></aside>
+      </div>
     </Screen>
   );
 }
@@ -290,10 +356,13 @@ export default function InternalViewContent(props: InternalViewContentProps) {
       case "empresa": return <CompanyView />;
       case "usuarios": return <UsersView />;
       case "roles": return <RolesView />;
+      case "cajas": return <CashRegistersView />;
+      case "auditoria": return <AuditView />;
       case "equipos": return <DevicesView />;
       case "metricas-ventas": return <SalesMetricsView />;
       case "estacion": return <StationView />;
       case "respaldos": return <BackupsView />;
+      case "puesta-marcha": return <GettingStartedView />;
     }
   }
 

@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useReducer, useRef, useState, type ReactNode, type RefObject } from "react";
 import InteractiveGuide, { type GuideModuleId } from "./InteractiveGuide";
 import InternalViewContent, { type AdministrationViewId, type CatalogViewId } from "./InternalViews";
+import LabModuleSurface from "./LabModuleSurface";
+import { createInitialLabState, labCycleReducer, type LabModuleId } from "./labCycle.js";
 
 type ModuleId = GuideModuleId;
 
 type ModuleDefinition = { id: ModuleId; label: string };
 type InternalViewId = AdministrationViewId | CatalogViewId;
 type InternalNavItem = { id: InternalViewId; label: string };
+type WorkspaceMode = "lab" | "showcase";
 
 const primaryModules: ModuleDefinition[] = [
   { id: "panel", label: "Panel principal" },
@@ -30,6 +33,12 @@ const secondaryModules: ModuleDefinition[] = [
   { id: "catalogo", label: "Catálogo" },
   { id: "administracion", label: "Administración" },
 ];
+
+const labModules = new Set<ModuleId>(["panel", "cotizaciones", "ventas", "caja", "produccion", "calidad", "entregas", "inventario", "finanzas"]);
+
+function isLabModule(id: ModuleId): id is LabModuleId {
+  return labModules.has(id);
+}
 
 const moduleCopy: Record<ModuleId, { title: string; subtitle: string }> = {
   panel: { title: "Panel principal", subtitle: "Pedidos pendientes y prioridades de la operación" },
@@ -53,10 +62,13 @@ const administrationViews: readonly InternalNavItem[] = [
   { id: "empresa", label: "Empresa" },
   { id: "usuarios", label: "Usuarios" },
   { id: "roles", label: "Roles y permisos" },
+  { id: "cajas", label: "Cajas físicas" },
+  { id: "auditoria", label: "Auditoría" },
   { id: "equipos", label: "Equipos conectados" },
   { id: "metricas-ventas", label: "Métricas de ventas" },
   { id: "estacion", label: "Estación e impresión" },
   { id: "respaldos", label: "Respaldos" },
+  { id: "puesta-marcha", label: "Puesta en marcha" },
 ];
 
 const catalogViews: readonly InternalNavItem[] = [
@@ -183,7 +195,7 @@ function MetricsModule() {
         <article><span>VENTAS DEL MES</span><strong>C$ 251,270</strong><small>34 documentos activos</small></article>
         <article className="positive"><span>COBRADO</span><strong>C$ 186,420</strong><small>74 % de lo emitido</small></article>
         <article className="negative"><span>GASTOS REGISTRADOS</span><strong>C$ 84,910</strong><small>Información ilustrativa</small></article>
-        <article className="positive"><span>UTILIDAD BRUTA EST.</span><strong>C$ 166,360</strong><small>Sin revelar fórmulas reales</small></article>
+        <article className="positive"><span>RESULTADO OPERATIVO</span><strong>C$ 101,510</strong><small>Resumen ilustrativo del período</small></article>
         <article className="warning"><span>POR COBRAR</span><strong>C$ 64,850</strong><small>6 documentos abiertos</small></article>
       </div>
       <div className="executive-panels">
@@ -222,6 +234,7 @@ function SalesModule() {
       </div>
       <div className="real-module">
         <ViewHeader title="Ventas y pedidos" subtitle="Captura comercial, fechas y seguimiento operativo en un solo registro." action="Nueva venta" />
+        <div className="order-context-strip"><div><small>SITUACIÓN COMERCIAL DEL CLIENTE</small><strong>Deuda pendiente · C$ 2,850</strong></div><div><small>SALDO A FAVOR</small><strong>C$ 1,000 disponible</strong></div><div className="order-context-actions"><button type="button" disabled>Cambiar fecha</button><button type="button" disabled>Agregar conceptos</button><button type="button" disabled>Cancelar conceptos</button></div></div>
         <div className="real-filterbar" data-guide-target="module-filter"><div className="fake-input">Buscar pedido o cliente…</div><select defaultValue="activos" aria-label="Estado"><option value="activos">Activos</option></select></div>
         <section className="real-table-card" data-guide-target="record-list">
           <div className="real-table-row real-table-head"><span>Pedido</span><span>Cliente</span><span>Entrega</span><span>Estado</span><span>Total</span></div>
@@ -239,9 +252,9 @@ function CashModule() {
   const orders = [["DEMO-1041", "Casa Nativa", "Pendiente", "16,300.00"], ["DEMO-1048", "Café Lumbre", "Abono", "5,720.00"], ["DEMO-1053", "Norte Creativo", "Pendiente", "8,950.00"]];
   return (
     <div className="real-module">
-      <ViewHeader title="Caja" subtitle="Cobros, transferencias pendientes y saldos de pedidos." actions={["Cerrar caja 20/07", "Retiro", "Cierre diario"]} />
+      <ViewHeader title="Caja" subtitle="Cobros, transferencias pendientes y saldos de pedidos." actions={["Historial y conciliación", "Retiro", "Cierre diario"]} />
       <div className="cash-summary" data-guide-target="module-metrics">
-        <div><strong>CAJA ABIERTA</strong><small>Fondo demo C$ 5,000.00</small></div>
+        <div><strong>CAJA TALLER DEMO</strong><small>Caja física abierta · Fondo C$ 5,000.00</small></div>
         <div><span>EFECTIVO ESPERADO</span><strong>C$ 26,420.00</strong></div>
         <div><span>EFECTIVO RECIBIDO</span><strong>C$ 18,700.00</strong></div>
         <div><span>TRANSFERENCIAS</span><strong>C$ 12,400.00</strong><small>3 por verificar</small></div>
@@ -277,7 +290,16 @@ function CustomersModule() {
 
 function FinanceModule() {
   return (
-    <div className="finance-real"><div className="finance-strip" data-guide-target="module-header"><div><h2>Finanzas</h2><p>Cartera, obligaciones, presupuesto y rentabilidad</p></div><div className="workspace-tabs" data-guide-target="workspace-tabs"><button className="active" type="button" disabled>Cuentas por cobrar</button><button type="button" disabled>Cuentas por pagar</button><button type="button" disabled>Planificación y rentabilidad</button></div></div><div className="real-module"><div className="real-metric-grid finance-metrics" data-guide-target="module-metrics"><article className="real-metric"><span>Saldo por cobrar</span><strong>{money.format(84650)}</strong></article><article className="real-metric metric-warning"><span>Vencido</span><strong>C$ 16,300</strong></article><article className="real-metric"><span>Documentos abiertos</span><strong>6</strong></article><article className="real-metric metric-success"><span>Recuperado este mes</span><strong>C$ 42,800</strong></article></div><section className="real-table-card" data-guide-target="record-list"><div className="real-table-row real-table-head"><span>Documento</span><span>Cliente</span><span>Vencimiento</span><span>Estado</span><span>Saldo</span></div><div className="real-table-row"><strong>DEMO-1041</strong><span>Casa Nativa</span><span>18/07/2026</span><span><Status tone="red">Vencido</Status></span><strong>C$ 16,300</strong></div><div className="real-table-row"><strong>DEMO-1048</strong><span>Café Lumbre</span><span>22/07/2026</span><span><Status tone="amber">Pendiente</Status></span><strong>C$ 5,720</strong></div></section></div></div>
+    <div className="finance-real">
+      <div className="finance-strip" data-guide-target="module-header"><div><h2>Finanzas</h2><p>Cartera, obligaciones, presupuesto y rentabilidad</p></div><div className="workspace-tabs" data-guide-target="workspace-tabs"><button className="active" type="button" disabled>Cuentas por cobrar</button><button type="button" disabled>Cuentas por pagar</button><button type="button" disabled>Resultado operativo</button><button type="button" disabled>Conciliación bancaria</button></div></div>
+      <div className="real-module">
+        <div className="real-metric-grid finance-metrics" data-guide-target="module-metrics"><article className="real-metric"><span>Saldo por cobrar</span><strong>{money.format(84650)}</strong></article><article className="real-metric metric-warning"><span>Vencido</span><strong>C$ 16,300</strong></article><article className="real-metric"><span>Saldo a favor</span><strong>C$ 4,250</strong></article><article className="real-metric metric-success"><span>Recuperado este mes</span><strong>C$ 42,800</strong></article></div>
+        <div className="finance-current-layout">
+          <section className="real-table-card" data-guide-target="record-list"><div className="real-table-row real-table-head"><span>Documento</span><span>Cliente</span><span>Vencimiento</span><span>Estado</span><span>Saldo</span></div><div className="real-table-row"><strong>DEMO-1041</strong><span>Casa Nativa</span><span>18/07/2026</span><span><Status tone="red">Vencido</Status></span><strong>C$ 16,300</strong></div><div className="real-table-row"><strong>DEMO-1048</strong><span>Café Lumbre</span><span>22/07/2026</span><span><Status tone="amber">Pendiente</Status></span><strong>C$ 5,720</strong></div></section>
+          <aside className="finance-source-card" data-guide-target="record-detail"><small>FUENTES DE PAGO · DEMO</small><h3>Origen claramente separado</h3><div><span>Efectivo de caja</span><strong>Caja Taller DEMO</strong></div><div><span>Banco / transferencia</span><strong>Cuenta Operativa DEMO</strong></div><div><span>Cuenta / reserva</span><strong>Fondo de Compras DEMO</strong></div><p>Las fuentes son ilustrativas y no mueven dinero.</p></aside>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -381,6 +403,8 @@ export default function DemoWorkspace() {
   const [active, setActive] = useState<ModuleId>("panel");
   const [moreOpen, setMoreOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>("lab");
+  const [labState, dispatchLab] = useReducer(labCycleReducer, undefined, createInitialLabState);
   const [administrationView, setAdministrationView] = useState<AdministrationViewId>("empresa");
   const [catalogView, setCatalogView] = useState<CatalogViewId>("productos");
   const contentRef = useRef<HTMLElement>(null);
@@ -394,6 +418,16 @@ export default function DemoWorkspace() {
   const showModule = (id: ModuleId, secondary = false) => {
     setActive(id);
     setMoreOpen(secondary);
+  };
+
+  const showLabModule = (id: LabModuleId) => {
+    showModule(id, secondaryModules.some((module) => module.id === id));
+  };
+
+  const resetLab = () => {
+    dispatchLab({ type: "reset" });
+    setActive("panel");
+    setMoreOpen(false);
   };
 
   const resetInternalScroll = () => {
@@ -424,20 +458,21 @@ export default function DemoWorkspace() {
   return (
     <section className="demo-section" aria-labelledby="demo-title">
       <div className="demo-section-heading">
-        <div><p className="eyebrow">Recorrido fiel al entorno de escritorio</p><h2 id="demo-title">Explora el menú real con información ficticia.</h2></div>
-        <div className="read-only-pill"><span aria-hidden="true">●</span> Solo lectura · Datos ficticios</div>
+        <div><p className="eyebrow">Laboratorio funcional aislado</p><h2 id="demo-title">Completa un ciclo operativo con datos ficticios.</h2></div>
+        <div className={`read-only-pill${workspaceMode === "lab" ? " lab-active-pill" : ""}`}><span aria-hidden="true">●</span> {workspaceMode === "lab" ? "LAB activo · Reiniciable" : "Recorrido · Solo lectura"}</div>
       </div>
 
-      <div ref={workspaceRef} className="workspace real-workspace" tabIndex={-1} aria-label="Demostración visual de InkGestión">
+      <div ref={workspaceRef} className="workspace real-workspace" tabIndex={-1} aria-label="Laboratorio visual de InkGestión con datos ficticios">
         <header className="app-titlebar real-titlebar">
           <span aria-hidden="true" />
-          <strong>Atelier Demo</strong>
-          <div className="titlebar-tools"><span>Actualización automática</span><WindowButton buttonRef={guideButtonRef} controls="context-guide" disabled={false} onClick={() => setGuideOpen((open) => !open)} pressed={guideOpen}>Guía</WindowButton><WindowButton>Actualizar</WindowButton></div>
+          <strong>Atelier Demo {workspaceMode === "lab" ? "· LAB" : ""}</strong>
+          <div className="workspace-mode-switch" role="group" aria-label="Modo de la demostración"><button className={workspaceMode === "lab" ? "active" : ""} type="button" onClick={() => setWorkspaceMode("lab")} aria-pressed={workspaceMode === "lab"}>Modo LAB</button><button className={workspaceMode === "showcase" ? "active" : ""} type="button" onClick={() => setWorkspaceMode("showcase")} aria-pressed={workspaceMode === "showcase"}>Recorrido</button></div>
+          <div className="titlebar-tools"><WindowButton buttonRef={guideButtonRef} controls="context-guide" disabled={false} onClick={() => setGuideOpen((open) => !open)} pressed={guideOpen}>Guía</WindowButton>{workspaceMode === "lab" ? <WindowButton disabled={false} onClick={resetLab}>Reiniciar LAB</WindowButton> : <WindowButton>Actualizar</WindowButton>}</div>
           <div className="window-actions"><WindowButton>—</WindowButton><WindowButton>□</WindowButton><WindowButton danger>×</WindowButton></div>
         </header>
 
         <aside className="app-sidebar real-sidebar">
-          <div className="company-identity"><div className="business-logo"><img src="./sistema-ink-icon.png" alt="InkGestión" /></div><strong>Atelier Demo</strong><small>Operación local</small></div>
+          <div className="company-identity"><div className="business-logo"><img src="./sistema-ink-icon.png" alt="InkGestión" /></div><strong>Atelier Demo</strong><small>{workspaceMode === "lab" ? "Laboratorio local" : "Recorrido visual"}</small></div>
           <div className="sidebar-scroll">
             <p className="nav-label">OPERACIÓN</p>
             <nav aria-label="Menú visual de InkGestión" data-guide-target="shell-navigation">
@@ -452,12 +487,12 @@ export default function DemoWorkspace() {
         </aside>
 
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">Módulo visible: {moduleCopy[active].title}.</p>
-        <section ref={contentRef} className={`app-content real-app-content${active === "administracion" || active === "catalogo" ? " internal-module-content" : ""}`} data-guide-target="module-surface" data-active-submenu={active === "administracion" ? administrationView : active === "catalogo" ? catalogView : undefined}><ModuleContent active={active} administrationView={administrationView} catalogView={catalogView} onAdministrationViewChange={showAdministrationView} onCatalogViewChange={showCatalogView} /></section>
+        <section ref={contentRef} className={`app-content real-app-content${active === "administracion" || active === "catalogo" ? " internal-module-content" : ""}`} data-guide-target="module-surface" data-active-submenu={active === "administracion" ? administrationView : active === "catalogo" ? catalogView : undefined}>{workspaceMode === "lab" && isLabModule(active) ? <LabModuleSurface active={active} state={labState} dispatch={dispatchLab} onNavigate={showLabModule} /> : <ModuleContent active={active} administrationView={administrationView} catalogView={catalogView} onAdministrationViewChange={showAdministrationView} onCatalogViewChange={showCatalogView} />}</section>
 
-        <footer className="app-statusbar real-statusbar" data-guide-target="status-bar"><span><i /> Modo demostración · datos ficticios</span><strong>InkGestión · Recorrido visual aislado</strong></footer>
+        <footer className="app-statusbar real-statusbar" data-guide-target="status-bar"><span><i /> {workspaceMode === "lab" ? "Modo LAB · estado temporal" : "Modo demostración · datos ficticios"}</span><strong>InkGestión · Sin conexión al producto real</strong></footer>
         <InteractiveGuide active={active} open={guideOpen} onClose={closeGuide} workspaceRef={workspaceRef} />
       </div>
-      <p className="demo-hint"><span aria-hidden="true">↖</span> El menú conserva la jerarquía visual del producto. Solo la navegación local está habilitada.</p>
+      <p className="demo-hint"><span aria-hidden="true">↖</span> Sigue el paso indicado por el LAB. Reiniciar restaura la cotización, los saldos y el inventario ficticio.</p>
     </section>
   );
 }

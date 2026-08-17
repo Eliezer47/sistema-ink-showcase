@@ -2,20 +2,37 @@ import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
-test("build contains the isolated InkGestión visual showcase", async () => {
-  const html = await readFile(new URL("../dist/index.html", import.meta.url), "utf8");
-  assert.match(html, /<title>InkGestión \| Recorrido visual<\/title>/i);
+test("build contains the isolated InkGestión visual laboratory", async () => {
+  const html = await readFile(new URL("../dist/client/index.html", import.meta.url), "utf8");
+  assert.match(html, /<title>InkGestión \| Laboratorio visual<\/title>/i);
   assert.match(html, /connect-src 'none'/i);
+  assert.match(html, /property="og:title" content="InkGestión · Laboratorio visual"/i);
+  assert.match(html, /og-v3\.png/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 
-  const assetNames = await readdir(new URL("../dist/assets/", import.meta.url));
+  const socialPreview = await readFile(new URL("../dist/client/og-v3.png", import.meta.url));
+  assert.ok(socialPreview.byteLength > 100_000);
+
+  const assetNames = await readdir(new URL("../dist/client/assets/", import.meta.url));
   const javascript = (
     await Promise.all(
-      assetNames.filter((name) => name.endsWith(".js")).map((name) => readFile(new URL(`../dist/assets/${name}`, import.meta.url), "utf8")),
+      assetNames.filter((name) => name.endsWith(".js")).map((name) => readFile(new URL(`../dist/client/assets/${name}`, import.meta.url), "utf8")),
     )
   ).join("\n");
 
   assert.match(javascript, /Demo visual aislada/i);
+  assert.match(javascript, /MODO LAB OPERATIVO/i);
+  assert.match(javascript, /Aprobar cotización/i);
+  assert.match(javascript, /Convertir en pedido/i);
+  assert.match(javascript, /Registrar anticipo/i);
+  assert.match(javascript, /Iniciar producción/i);
+  assert.match(javascript, /Aprobar calidad/i);
+  assert.match(javascript, /Preparar despacho/i);
+  assert.match(javascript, /Registrar entrega/i);
+  assert.match(javascript, /Cobrar saldo/i);
+  assert.match(javascript, /Revisar comprobante/i);
+  assert.match(javascript, /Reiniciar LAB/i);
+  assert.match(javascript, /Ciclo completado/i);
   assert.match(javascript, /Datos ficticios/i);
   assert.match(javascript, /Panel principal/i);
   assert.match(javascript, /Métricas/i);
@@ -30,6 +47,9 @@ test("build contains the isolated InkGestión visual showcase", async () => {
   assert.match(javascript, /Proveedores/i);
   assert.match(javascript, /Métricas de ventas/i);
   assert.match(javascript, /Respaldos y diagnóstico/i);
+  assert.match(javascript, /Cajas físicas/i);
+  assert.match(javascript, /Auditoría/i);
+  assert.match(javascript, /Puesta en marcha/i);
   assert.match(javascript, /Compras abiertas/i);
   assert.match(javascript, /Valor por recibir/i);
   assert.match(javascript, /Inspeccionar y recibir/i);
@@ -54,4 +74,22 @@ test("build contains the isolated InkGestión visual showcase", async () => {
   assert.match(javascript, /carrusel/i);
   assert.doesNotMatch(javascript, /Entiende el flujo, módulo por módulo/i);
   assert.doesNotMatch(javascript, /localhost:5114|Bearer\s|SistemaInk\.Contracts/i);
+});
+
+test("build exposes a static Sites worker without application connectivity", async () => {
+  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
+  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
+  const { default: worker } = await import(workerUrl.href);
+
+  const response = await worker.fetch(
+    new Request("https://lab.example/ruta-interna"),
+    {
+      ASSETS: {
+        fetch: async (request) => new Response(new URL(request.url).pathname === "/index.html" ? "LAB SHELL" : "Not found", { status: new URL(request.url).pathname === "/index.html" ? 200 : 404 }),
+      },
+    },
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), "LAB SHELL");
 });

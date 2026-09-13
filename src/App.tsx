@@ -1,66 +1,78 @@
+import { useEffect, useRef, useState } from "react";
 import DemoWorkspace from "./DemoWorkspace";
 import AuxiliaryViews from "./AuxiliaryViews";
-import BenefitsSection from "./BenefitsSection";
+import DemoDialog from "./DemoDialog";
 import { DemoSession } from "./DemoSession";
 
 export default function App() {
+  const [information, setInformation] = useState<"about" | "views" | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  const expandButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!expanded) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const closeExpanded = (event: KeyboardEvent) => {
+      // A dialog or guide handles its own Escape before the workspace does.
+      if (event.key !== "Escape" || document.querySelector("dialog[open], #context-guide")) return;
+      setExpanded(false);
+      expandButtonRef.current?.focus({ preventScroll: true });
+    };
+    window.addEventListener("keydown", closeExpanded);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeExpanded);
+    };
+  }, [expanded]);
+
   return (
-    <main>
-      <section className="hero" aria-labelledby="page-title">
-        <div className="hero-copy">
-          <a className="back-link" href="https://eliezer47.github.io/portfolio/#/project">
-            <span aria-hidden="true">←</span> Portafolio de Eliezer Ponce
-          </a>
-          <p className="eyebrow">Caso de estudio · Aplicación de escritorio</p>
-          <h1 id="page-title">
-            La operación completa,
-            <span> en una sola vista.</span>
-          </h1>
-          <p className="hero-lead">
-            Conoce InkGestión, la solución para coordinar ventas, caja, producción
-            y entregas de Ink Multiservicios. Explora sus pantallas y sigue un pedido
-            de ejemplo desde la cotización hasta la entrega.
-          </p>
-        </div>
-
-        <aside className="demo-notice" aria-label="Alcance de la demostración">
-          <span className="notice-dot" aria-hidden="true" />
+    <div className={`demo-site${expanded ? " expanded" : ""}`}>
+      <a className="demo-skip-link" href="#demo-main">Ir al sistema</a>
+      <header className="demo-site-header">
+        <div className="demo-site-identity">
+          <img src="./sistema-ink-icon.png" alt="" width="38" height="38" />
           <div>
-            <strong>Demo visual aislada</strong>
-            <p>Recreación web del sistema de escritorio, con datos ficticios y operaciones simuladas. Referencia: versión 1.10.3.</p>
+            <div className="demo-site-brand"><h1>InkGestión</h1><span>Demo</span></div>
+            <p className="demo-site-notice">Datos ficticios · Operaciones simuladas</p>
           </div>
-        </aside>
-      </section>
-
-      <DemoSession><DemoWorkspace /></DemoSession>
-
-      <AuxiliaryViews />
-
-      <BenefitsSection />
-
-      <section className="trust-section" aria-labelledby="trust-title">
-        <div>
-          <p className="eyebrow">Conoce el alcance antes de decidir</p>
-          <h2 id="trust-title">Explora el sistema con un ejemplo seguro.</h2>
-          <p className="trust-intro">La demo representa pantallas y recorridos de la versión 1.10.3. La instalación real agrega los usuarios, permisos, documentos, impresoras y datos de tu negocio.</p>
         </div>
-        <div className="trust-list">
-          <p><strong>Datos sintéticos.</strong> Nombres, pedidos, importes y estados fueron creados para esta presentación.</p>
-          <p><strong>Un ejemplo reiniciable.</strong> Los cobros y entregas del recorrido solo cambian datos ficticios. Recargar restaura el inicio.</p>
-          <p><strong>Validación en tu negocio.</strong> La demo no acredita instalación, rendimiento, impresión física o seguridad. Esas capacidades se revisan en una demostración privada del producto.</p>
-        </div>
-      </section>
+        <nav className="demo-site-actions" aria-label="Información de la demo">
+          <button type="button" aria-haspopup="dialog" onClick={() => setInformation("about")}>Acerca de esta demo</button>
+          <a href="mailto:eliezerponcexd@gmail.com">Contacto <span aria-hidden="true">↗</span></a>
+        </nav>
+      </header>
 
-      <footer className="site-footer">
-        <div>
-          <strong>InkGestión · Recorrido visual</strong>
-          <p>Proyecto comercial de Eliezer Ponce.</p>
-        </div>
-        <div className="footer-links">
-          <a href="https://github.com/Eliezer47/sistema-ink-showcase">Repositorio</a>
-          <a href="mailto:eliezerponcexd@gmail.com">Solicitar demostración privada</a>
-        </div>
+      <main id="demo-main" tabIndex={-1}>
+        <DemoSession><DemoWorkspace expanded={expanded} expandButtonRef={expandButtonRef} onToggleExpanded={() => setExpanded((value) => !value)} onShowViews={() => setInformation("views")} /></DemoSession>
+      </main>
+
+      <footer className="demo-site-footer">
+        <a href="https://inkmultiservicios.com/sistemas/">← Volver a Sistemas</a>
+        <a href="https://eliezer47.github.io/portfolio/#/project">Eliezer Ponce <span aria-hidden="true">↗</span></a>
       </footer>
-    </main>
+
+      {information && <DemoDialog
+        wide={information === "views"}
+        title={information === "views" ? "Más vistas del sistema" : "Acerca de esta demo"}
+        closeLabel={information === "views" ? "Cerrar más vistas" : "Cerrar información"}
+        footer="InkGestión · Demo visual aislada"
+        onClose={() => setInformation(null)}
+      >
+        {information === "views" ? <AuxiliaryViews /> : <div className="demo-about">
+          <p className="demo-about-version">Referencia del sistema · 1.10.3</p>
+          <p>Recreación web de la aplicación de escritorio. Los registros son ficticios y las acciones habilitadas solo cambian el ejemplo.</p>
+          <dl>
+            <div><dt>Explorar pantallas</dt><dd>Consulta los módulos y sus registros de muestra. El menú representa un perfil completo; en el producto depende de la configuración y los permisos.</dd></div>
+            <div><dt>Seguir un pedido</dt><dd>Recorre una cotización, su cobro y entrega. El ejemplo conserva sus cambios entre módulos; puedes reiniciarlo o recargar la página.</dd></div>
+            <div><dt>Más vistas</dt><dd>Conoce el acceso, servidor, PIN, impresión, baucher y estado de conexión. Se muestran como vistas ilustrativas.</dd></div>
+            <div><dt>Ampliar vista</dt><dd>Usa más espacio sin perder el pedido. Sal con el botón de la barra o con Escape. En pantallas pequeñas, el selector y las flechas permiten recorrer la vista de escritorio.</dd></div>
+          </dl>
+          <p>Calculadora, Artículos del cliente y Calidad son accesos opcionales del perfil mostrado. Los botones deshabilitados corresponden a funciones que no se ejecutan en esta demo.</p>
+          <p className="demo-about-boundary">Sin conexión al producto comercial. Impresión física, permisos, respaldos y trabajo multiusuario se validan en una demostración del sistema instalado.</p>
+          <a href="https://github.com/Eliezer47/sistema-ink-showcase">Repositorio de la demo <span aria-hidden="true">↗</span></a>
+        </div>}
+      </DemoDialog>}
+    </div>
   );
 }

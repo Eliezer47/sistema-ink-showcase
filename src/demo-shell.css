@@ -1,0 +1,132 @@
+/* Public presentation only; the system's module layout stays independent. */
+body { background: #0d171e; }
+.demo-site { display: flex; flex-direction: column; height: 100dvh; min-height: 680px; }
+.demo-site > main { display: flex; flex: 1; min-height: 0; }
+.demo-site-header,
+.demo-site-footer,
+.demo-site .demo-section {
+  width: calc(100% - 32px);
+  max-width: 1600px;
+  margin-inline: auto;
+}
+.demo-site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 80px;
+  padding: 14px 0;
+  border-bottom: 1px solid #293c47;
+}
+.demo-site-identity { display: flex; align-items: center; gap: 12px; }
+.demo-site-identity img { object-fit: contain; }
+.demo-site-brand { display: flex; align-items: center; gap: 10px; }
+.demo-site-brand h1 { margin: 0; color: #edf4f7; font-size: 21px; font-weight: 650; letter-spacing: -.03em; }
+.demo-site-brand > span { font-size: 10px; font-weight: 650; color: #83d8d7; background: #153739; border: 1px solid #315658; border-radius: 4px; padding: 3px 6px; }
+.demo-site-notice { margin: 5px 0 0; color: #a7bac4; font-size: 11px; line-height: 1.5; }
+.demo-site-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.demo-site-actions button,
+.demo-site-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: #b9cbd4;
+  font-size: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.demo-site-actions button:hover { color: #eff9fa; background: #1c303c; }
+.demo-site-actions a { border-color: #355660; color: #a2e0de; margin-left: 5px; }
+.demo-site-actions a:hover { background: #183b41; }
+.demo-site .demo-section { display: flex; flex-direction: column; min-height: 0; padding: 12px 0 0; overflow: visible; }
+.demo-site .demo-experience-toolbar {
+  padding: 10px 12px;
+  margin: 0 0 12px;
+  gap: 12px;
+  border-color: #304753;
+  border-radius: 6px;
+  background: #14242d;
+}
+.demo-site .demo-experience-toolbar button { min-height: 36px; padding: 8px 12px; font-size: 12px; }
+.demo-site .demo-operation-settings.compact label { font-size: 11px; }
+.demo-site .demo-operation-settings.compact select { min-height: 36px; padding-block: 7px; }
+.demo-experience-toolbar { flex-shrink: 0; position: sticky; top: 0; z-index: 65; }
+.demo-workspace-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.demo-workspace-scroll { flex: 1; min-height: 0; overflow: auto; border: 1px solid #3c515d; border-radius: 6px; scrollbar-color: #7596a5 #152831; }
+.demo-site .real-workspace { height: 100%; min-height: 0; grid-template-rows: 38px minmax(0, 1fr) 28px; border: 0; box-shadow: none; }
+.demo-site .real-app-content { min-height: 0; }
+.demo-site .context-guide-layer { z-index: 70; }
+.demo-site .context-guide-card::before { left: 0; right: 0; top: 0; }
+.demo-site .internal-nav { grid-template-rows: auto minmax(0, 1fr) auto; }
+.demo-expanded-notice { flex-basis: 100%; margin: 0; color: #a7bac4; font-size: 11px; }
+.demo-expanded-notice strong { color: #e3f6f7; margin-right: 12px; }
+.demo-site.expanded { position: fixed; inset: 0; height: 100dvh; min-height: 0; z-index: 80; background: #0d171e; overflow: auto; }
+.demo-site.expanded .demo-site-header, .demo-site.expanded .demo-site-footer { display: none; }
+.demo-site.expanded > main { min-height: 580px; }
+.demo-site.expanded .demo-section { width: calc(100% - 16px); max-width: none; padding: 8px 0; }
+.demo-viewport-navigation { flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: end; gap: 8px; padding: 0 0 9px; }
+.demo-viewport-navigation[hidden] { display: none; }
+.demo-viewport-navigation label { display: grid; flex: 1; min-width: 0; gap: 5px; font-size: 11px; color: #b4c9d3; }
+.demo-viewport-navigation select { width: 100%; min-width: 0; min-height: 36px; border: 1px solid #486675; border-radius: 4px; background: #182c38; color: #edf5f7; padding: 6px 9px; font: inherit; font-size: 12px; }
+.demo-pan-actions { display: flex; gap: 6px; }
+.demo-pan-actions button { min-height: 36px; min-width: 40px; border: 1px solid #486675; border-radius: 4px; background: #182c38; color: #c4f4f2; font-size: 18px; cursor: pointer; }
+.demo-pan-actions button:disabled { opacity: .4; cursor: default; }
+.demo-viewport-navigation p { flex-basis: 100%; color: #9bb4c0; font-size: 11px; margin: 0; }
+.demo-viewport-navigation :focus-visible, .demo-site-actions :focus-visible { outline: 3px solid #19aeb6; outline-offset: 2px; }
+.demo-site-footer { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; padding: 15px 0 18px; color: #8fa6b3; font-size: 11px; }
+.demo-site-footer a { color: #abc0cb; text-decoration: none; }
+.demo-site-footer a:hover { color: #c7f5f2; }
+.demo-skip-link { position: absolute; top: -80px; left: 16px; z-index: 20; background: #e7f9f8; color: #14424b; border-radius: 5px; padding: 12px; }
+.demo-skip-link:focus { top: 12px; }
+.demo-workspace-scroll:focus-visible { outline: 3px solid #19aeb6; outline-offset: 3px; }
+.demo-about { color: #3d5865; font-size: 13px; line-height: 1.7; }
+.demo-about p { margin: 0 0 18px; }
+.demo-about .demo-about-version { color: #15717a; font-size: 12px; font-weight: 650; }
+.demo-about dl { margin: 0 0 18px; }
+.demo-about dl > div { border-bottom: 1px solid #d6e1e6; padding: 12px 0; }
+.demo-about dt { font-weight: 650; color: #213f4b; }
+.demo-about dd { margin: 4px 0 0; }
+.demo-about-boundary { background: #e4eef1; border-left: 3px solid #417987; padding: 13px 16px; font-size: 12px; }
+.demo-about > a { color: #176c75; font-size: 12px; }
+.supplementary-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.supplementary-tabs button { min-height: 38px; border: 1px solid #b6c7cf; border-radius: 4px; background: #fff; color: #385661; padding: 8px 15px; font-size: 12px; cursor: pointer; }
+.supplementary-tabs button[aria-selected="true"] { background: #0b7e87; border-color: #0b7e87; color: #fff; }
+.supplementary-views [role="tabpanel"] > h3 { color: #253f4b; font-size: 18px; font-weight: 600; margin: 0 0 8px; }
+.supplementary-views [role="tabpanel"] > p { color: #566f7b; font-size: 12px; line-height: 1.65; margin: 0 0 18px; max-width: 800px; }
+.supplementary-stage { overflow: auto; padding: 22px; border: 1px solid #c9d6dd; border-radius: 6px; background: #dfe8ed; }
+.supplementary-stage .aux-window { margin-inline: auto; }
+@media (max-width: 1212px) {
+  .demo-site .context-guide-card, .demo-site .context-guide-card.dock-left { position: fixed; left: auto; right: 12px; top: auto; bottom: 12px; width: min(316px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow-y: auto; }
+  .demo-site .context-guide-card > header { position: sticky; top: 0; z-index: 1; background: #f8fafb; }
+}
+@media (max-width: 760px) {
+  .demo-site { min-height: 820px; }
+  .demo-site-header { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .demo-site-actions { width: 100%; }
+  .demo-site-actions a { margin-left: auto; }
+  .demo-site .demo-experience-toolbar { align-items: stretch; }
+  .demo-site .demo-operation-settings.compact { width: 100%; }
+  .demo-site .demo-operation-settings.compact label { display: grid; gap: 6px; }
+  .demo-site .demo-operation-settings.compact select { width: 100%; max-width: none; }
+  .demo-workspace-actions { width: 100%; }
+  .demo-workspace-actions button { flex: 1; white-space: nowrap; }
+  .demo-site .demo-experience-toolbar { gap: 8px; padding: 9px; margin-bottom: 9px; }
+  .demo-site .demo-experience-toolbar > [role="group"] { width: 100%; }
+  .demo-site .demo-experience-toolbar > [role="group"] button { flex: 1; }
+  .demo-expanded-notice { display: grid; gap: 4px; }
+  .demo-site.expanded > main { min-height: 640px; }
+  .supplementary-stage { padding: 12px; }
+}
+@media (max-width: 420px) {
+  .demo-site-header, .demo-site-footer, .demo-site .demo-section { width: calc(100% - 24px); }
+  .demo-site-actions { gap: 2px; }
+  .demo-site-actions button, .demo-site-actions a { padding: 8px; font-size: 11px; }
+  .demo-site .demo-experience-toolbar > [role="group"] { width: 100%; }
+  .demo-site .demo-experience-toolbar > [role="group"] button { flex: 1; padding-inline: 6px; }
+  .supplementary-tabs button { padding-inline: 11px; }
+}

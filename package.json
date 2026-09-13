@@ -12,7 +12,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "check:public": "node --test tests/public-safety.test.mjs",
-    "test": "pnpm build && node --test tests/*.test.mjs"
+    "test": "pnpm build && node --test tests/*.test.mjs",
+    "release:prepare": "pnpm test && node scripts/prepare-release.mjs"
   },
   "dependencies": {
     "react": "19.2.6",

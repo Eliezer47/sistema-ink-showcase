@@ -1,6 +1,29 @@
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
+import { extname } from "node:path";
 import test from "node:test";
+
+test("deployment contains only public runtime assets without source maps", async () => {
+  const publicExtensions = new Set([".html", ".css", ".js", ".png", ".svg", ".jpg", ".jpeg", ".webp", ".ico", ".woff2"]);
+  async function inspect(directory) {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      assert.ok(!entry.name.startsWith("."), `Unexpected hidden deployment entry: ${entry.name}`);
+      assert.ok(!entry.isSymbolicLink(), `Deployment must not link external files: ${entry.name}`);
+      const resource = new URL(entry.name + (entry.isDirectory() ? "/" : ""), directory);
+      if (entry.isDirectory()) {
+        await inspect(resource);
+        continue;
+      }
+      const extension = extname(entry.name).toLowerCase();
+      assert.ok(entry.isFile() && publicExtensions.has(extension), `Unexpected deployment asset: ${entry.name}`);
+      if ([".html", ".css", ".js"].includes(extension)) {
+        const content = await readFile(resource, "utf8");
+        assert.doesNotMatch(content, /[#@]\s*sourceMappingURL\s*=/i, `Source map reference in ${entry.name}`);
+      }
+    }
+  }
+  await inspect(new URL("../dist/", import.meta.url));
+});
 
 test("build contains the isolated InkGestión visual showcase", async () => {
   const html = await readFile(new URL("../dist/index.html", import.meta.url), "utf8");
@@ -33,7 +56,9 @@ test("build contains the isolated InkGestión visual showcase", async () => {
   assert.match(javascript, /Compras abiertas/i);
   assert.match(javascript, /Valor por recibir/i);
   assert.match(javascript, /Inspeccionar y recibir/i);
-  assert.match(javascript, /Detalles que hacen más simple el trabajo diario/i);
+  assert.match(javascript, /Datos ficticios · Operaciones simuladas/i);
+  assert.match(javascript, /Más vistas del sistema/i);
+  assert.match(javascript, /Acerca de esta demo/i);
   assert.match(javascript, /Iniciar sesión/i);
   assert.match(javascript, /Conectar con el servidor/i);
   assert.match(javascript, /Configurar PIN/i);
@@ -42,16 +67,10 @@ test("build contains the isolated InkGestión visual showcase", async () => {
   assert.match(javascript, /80 mm/i);
   assert.match(javascript, /58 mm/i);
   assert.match(javascript, /No válido como comprobante fiscal/i);
-  assert.match(javascript, /Pausar recorrido automático/i);
-  assert.match(javascript, /Reanudar recorrido automático/i);
   assert.match(javascript, /Sin comunicación con el servidor/i);
   assert.match(javascript, /Sin tráfico de red/i);
-  assert.match(javascript, /Una herramienta pensada alrededor del trabajo real/i);
-  assert.match(javascript, /Todo el flujo conserva su contexto/i);
-  assert.match(javascript, /Impresión lista para cada estación/i);
-  assert.match(javascript, /Control sin perder continuidad/i);
-  assert.match(javascript, /Las simulaciones usan datos ficticios/i);
-  assert.match(javascript, /carrusel/i);
+  assert.match(javascript, /Sin conexión al producto comercial/i);
+  assert.doesNotMatch(javascript, /Una herramienta pensada alrededor del trabajo real|Pausar recorrido automático|Reanudar recorrido automático/i);
   for (const label of ["Seguir un pedido", "Ventas rápidas", "Cobro rápido", "Calculadora de costos", "Disponibilidad rápida", "Familias y variantes", "Auditoría", "Registrar para verificar"]) {
     assert.ok(javascript.includes(label), `Missing new capability: ${label}`);
   }

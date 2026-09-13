@@ -162,7 +162,7 @@ export function ProductionExample() {
       { id: "p2", cells: ["PED-DEMO-0199", "Estudio Prisma", "Acabado", "11/09", "Finalizada"], title: "Acabado · 20 agendas", facts: [["Estado", "Finalizada"], ["Cantidad", "20 unidades"], ["Tiempo efectivo", "01:10"], ["Costo estimado", "C$ 1,420.00"], ["Costo real ilustrativo", "C$ 1,480.00"], ["Variación", "C$ 60.00 desfavorable"]] },
       { id: "p3", cells: ["PED-DEMO-0192", "Taller Horizonte", "Bordar", "16/09", "Pausada"], title: "Bordado · 10 uniformes", facts: [["Estado", "Pausada"], ["Cantidad", "10 unidades"], ["Tiempo efectivo", "00:25"], ["Artículo del cliente", "Sí · REC-DEMO-0085"], ["Incidencia relacionada", "INC-DEMO-0018"]] },
     ]} actions={<><PreviewButton>Iniciar</PreviewButton><PreviewButton>Pausar</PreviewButton><PreviewButton>Finalizar</PreviewButton><PreviewButton>Registrar consumo</PreviewButton></>} />
-    <details className="faithful-disclosure"><summary>Costos reales del período</summary><p>El producto prepara una vista previa de la distribución de mano de obra e indirectos sobre trabajos con tiempo finalizado. Se revisa cobertura, costo real y variación antes de confirmar; una sesión abierta o un período superpuesto impiden cerrar.</p></details>
+    <details className="faithful-disclosure"><summary>Costos reales del período</summary><p>Consulta el costo estimado, el costo registrado y su variación para revisar el resultado del trabajo. Esta vista utiliza importes ficticios.</p></details>
   </DemoPage>;
 }
 

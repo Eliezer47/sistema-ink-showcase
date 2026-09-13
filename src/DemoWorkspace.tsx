@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import InteractiveGuide, { type GuideModuleId } from "./InteractiveGuide";
 import InternalViewContent, { type AdministrationViewId, type CatalogViewId } from "./InternalViews";
 import { useDemoSession } from "./DemoSession";
@@ -284,7 +284,12 @@ function ModuleContent({ active, administrationView, catalogView, onAdministrati
   return <InternalModule id={active} administrationView={administrationView} catalogView={catalogView} onAdministrationViewChange={onAdministrationViewChange} onCatalogViewChange={onCatalogViewChange} />;
 }
 
-export default function DemoWorkspace() {
+export default function DemoWorkspace({ expanded, expandButtonRef, onToggleExpanded, onShowViews }: {
+  expanded: boolean;
+  expandButtonRef: RefObject<HTMLButtonElement | null>;
+  onToggleExpanded: () => void;
+  onShowViews: () => void;
+}) {
   const { state, dispatch } = useDemoSession();
   const [followingScenario, setFollowingScenario] = useState(false);
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
@@ -297,6 +302,27 @@ export default function DemoWorkspace() {
   const contentRef = useRef<HTMLElement>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const guideButtonRef = useRef<HTMLButtonElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [pan, setPan] = useState({ overflow: false, left: false, right: false });
+  const visiblePrimary = primaryModules.filter((module) => state.mode !== "simple" || (module.id !== "produccion" && module.id !== "entregas"));
+  const selectableModules = [...visiblePrimary, ...secondaryModules];
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    const workspace = workspaceRef.current;
+    if (!viewport || !workspace) return;
+    const updatePan = () => {
+      const remaining = viewport.scrollWidth - viewport.clientWidth;
+      const next = { overflow: remaining > 1, left: viewport.scrollLeft > 1, right: viewport.scrollLeft < remaining - 1 };
+      setPan((previous) => previous.overflow === next.overflow && previous.left === next.left && previous.right === next.right ? previous : next);
+    };
+    const observer = new ResizeObserver(updatePan);
+    observer.observe(viewport);
+    observer.observe(workspace);
+    viewport.addEventListener("scroll", updatePan);
+    updatePan();
+    return () => { observer.disconnect(); viewport.removeEventListener("scroll", updatePan); };
+  }, []);
 
   useEffect(() => {
     contentRef.current?.scrollTo({ left: 0, top: 0 });
@@ -314,12 +340,15 @@ export default function DemoWorkspace() {
   const navigate = (id: ModuleId) => showModule(id, secondaryModules.some((module) => module.id === id));
 
   useEffect(() => {
-    if (state.mode === "simple" && !followingScenario && (active === "produccion" || active === "entregas")) setActive("ventas");
-  }, [state.mode, followingScenario, active]);
+    if (state.mode === "simple") setActive((current) => current === "produccion" || current === "entregas" ? "ventas" : current);
+  }, [state.mode, followingScenario]);
 
   useEffect(() => {
     const handleAvailability = (event: KeyboardEvent) => {
-      if (event.key === "F3") { event.preventDefault(); setAvailabilityOpen(true); }
+      if (event.key === "F3") {
+        event.preventDefault();
+        if (!document.querySelector("dialog[open]")) setAvailabilityOpen(true);
+      }
     };
     window.addEventListener("keydown", handleAvailability);
     return () => window.removeEventListener("keydown", handleAvailability);
@@ -341,7 +370,7 @@ export default function DemoWorkspace() {
 
   const closeGuide = () => {
     setGuideOpen(false);
-    requestAnimationFrame(() => guideButtonRef.current?.focus());
+    requestAnimationFrame(() => guideButtonRef.current?.focus({ preventScroll: true }));
   };
 
   const renderNavButton = (module: ModuleDefinition, secondary = false) => (
@@ -352,22 +381,40 @@ export default function DemoWorkspace() {
 
   return (
     <section className="demo-section" aria-labelledby="demo-title">
-      <div className="demo-section-heading">
-        <div><p className="eyebrow">INKGESTIÓN · REFERENCIA 1.10.3</p><h2 id="demo-title">Conoce las pantallas. Recorre un pedido.</h2></div>
-        <div className="read-only-pill"><span aria-hidden="true">●</span> Demo interactiva · Datos ficticios</div>
-      </div>
+      <h2 id="demo-title" className="sr-only">Explorar InkGestión</h2>
 
       <div className="demo-experience-toolbar">
-        <div role="group" aria-label="Experiencia de demostración"><button type="button" aria-pressed={!followingScenario} onClick={() => setFollowingScenario(false)}>Explorar pantallas</button><button type="button" aria-pressed={followingScenario} onClick={() => { setFollowingScenario(true); setActive("panel"); }}>Seguir un pedido</button></div>
+        {expanded && <p className="demo-expanded-notice"><strong>InkGestión · Demo</strong> Datos ficticios · Operaciones simuladas</p>}
+        <div role="group" aria-label="Experiencia de demostración"><button type="button" aria-pressed={!followingScenario} onClick={() => setFollowingScenario(false)}>Explorar pantallas</button><button type="button" aria-pressed={followingScenario} onClick={() => { setFollowingScenario(true); if (!scenarioModules.has(active)) navigate("panel"); }}>Seguir un pedido</button></div>
         <DemoControls compact />
-        {followingScenario && <button type="button" onClick={() => { dispatch({ type: "reset" }); setActive("panel"); setGuideOpen(false); }}>Reiniciar ejemplo</button>}
+        <div className="demo-workspace-actions">
+          <button ref={guideButtonRef} type="button" aria-controls="context-guide" aria-pressed={guideOpen} onClick={() => setGuideOpen((open) => !open)}>Guía</button>
+          <button type="button" aria-haspopup="dialog" onClick={onShowViews}>Más vistas</button>
+          <button ref={expandButtonRef} type="button" aria-pressed={expanded} onClick={onToggleExpanded}>{expanded ? "Salir de vista ampliada" : "Ampliar vista"}</button>
+          {followingScenario && <button type="button" aria-label="Reiniciar ejemplo" onClick={() => { dispatch({ type: "reset" }); navigate("panel"); setGuideOpen(false); }}>Reiniciar</button>}
+        </div>
       </div>
-      <p className="demo-profile-note">Perfil de demostración con todos los módulos disponibles; Calculadora, Artículos del cliente y Calidad se muestran como accesos opcionales. En el producto, menú y permisos son configurables.</p>
+      <div className="demo-viewport-navigation" hidden={!pan.overflow}>
+        <label>Pantalla<select aria-label="Ir a pantalla" value={active} onChange={(event) => {
+          const id = event.target.value as ModuleId;
+          navigate(id);
+          if (id !== "disponibilidad") viewportRef.current?.scrollTo({ left: 190 });
+        }}>
+          {!selectableModules.some((module) => module.id === active) && <option value={active}>{moduleCopy[active].title} · Paso del pedido</option>}
+          {selectableModules.map((module) => <option key={module.id} value={module.id}>{module.label}</option>)}
+        </select></label>
+        <div className="demo-pan-actions">
+          <button type="button" disabled={!pan.left} aria-label="Desplazar vista a la izquierda" onClick={() => viewportRef.current?.scrollBy({ left: -viewportRef.current.clientWidth * 0.8 })}>←</button>
+          <button type="button" disabled={!pan.right} aria-label="Desplazar vista a la derecha" onClick={() => viewportRef.current?.scrollBy({ left: viewportRef.current.clientWidth * 0.8 })}>→</button>
+        </div>
+        <p id="demo-pan-hint">Vista de escritorio · Desliza o usa las flechas para recorrerla.</p>
+      </div>
+      <div ref={viewportRef} className="demo-workspace-scroll" role="region" aria-label="Ventana del sistema" aria-describedby={pan.overflow ? "demo-pan-hint" : undefined} tabIndex={0}>
       <div ref={workspaceRef} className="workspace real-workspace" tabIndex={-1} aria-label="Demostración visual de InkGestión">
         <header className="app-titlebar real-titlebar">
           <span aria-hidden="true" />
           <strong>Atelier Demo</strong>
-          <div className="titlebar-tools"><span>Caja: Mostrador DEMO</span><WindowButton disabled={false} onClick={() => setAlertsOpen(true)}>Alertas · 3</WindowButton><WindowButton buttonRef={guideButtonRef} controls="context-guide" disabled={false} onClick={() => setGuideOpen((open) => !open)} pressed={guideOpen}>Guía</WindowButton><WindowButton>Actualizar</WindowButton></div>
+          <div className="titlebar-tools"><span>Caja: Mostrador DEMO</span><WindowButton disabled={false} onClick={() => setAlertsOpen(true)}>Alertas · 3</WindowButton><WindowButton>Actualizar</WindowButton></div>
           <div className="window-actions"><WindowButton>—</WindowButton><WindowButton>□</WindowButton><WindowButton danger>×</WindowButton></div>
         </header>
 
@@ -376,7 +423,7 @@ export default function DemoWorkspace() {
           <div className="sidebar-scroll">
             <p className="nav-label">OPERACIÓN</p>
             <nav aria-label="Menú visual de InkGestión" data-guide-target="shell-navigation">
-              {primaryModules.filter((module) => state.mode !== "simple" || (module.id !== "produccion" && module.id !== "entregas")).map((module) => renderNavButton(module))}
+              {visiblePrimary.map((module) => renderNavButton(module))}
               <div className="more-navigation">
                 <button className="more-toggle" type="button" onClick={() => setMoreOpen((open) => !open)} aria-expanded={moreOpen} data-guide-target="more-options"><span aria-hidden="true">{moreOpen ? "▾" : "▸"}</span>MÁS OPCIONES</button>
                 {moreOpen ? <div className="secondary-navigation">{secondaryModules.map((module) => renderNavButton(module, true))}</div> : null}
@@ -389,8 +436,9 @@ export default function DemoWorkspace() {
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">Módulo visible: {moduleCopy[active].title}.</p>
         <section ref={contentRef} className={`app-content real-app-content${active === "administracion" || active === "catalogo" ? " internal-module-content" : ""}`} data-guide-target="module-surface" data-active-submenu={active === "administracion" ? administrationView : active === "catalogo" ? catalogView : undefined}>{followingScenario && scenarioModules.has(active) ? <ScenarioModule key={active} active={active} onNavigate={navigate} /> : <ModuleContent active={active} administrationView={administrationView} catalogView={catalogView} onAdministrationViewChange={showAdministrationView} onCatalogViewChange={showCatalogView} />}</section>
 
-        <footer className="app-statusbar real-statusbar" data-guide-target="status-bar"><span><i /> {followingScenario ? "Pedido de ejemplo · Estado temporal" : "Modo demostración · datos ficticios"}</span><strong>InkGestión · Recorrido visual aislado</strong></footer>
+        <footer className="app-statusbar real-statusbar" data-guide-target="status-bar"><span><i /> {followingScenario ? "Pedido de ejemplo" : "Explorar pantallas"}</span><strong>InkGestión</strong></footer>
         <InteractiveGuide active={active} open={guideOpen} onClose={closeGuide} workspaceRef={workspaceRef} />
+      </div>
       </div>
       {availabilityOpen && <DemoDialog wide title="Disponibilidad rápida · F3" onClose={() => setAvailabilityOpen(false)}><AvailabilityExample stock={followingScenario ? scenarioSummary(state) : undefined} /></DemoDialog>}
       {alertsOpen && <DemoDialog title="Centro de notificaciones" onClose={() => setAlertsOpen(false)}><div className="demo-alerts">{[
@@ -398,7 +446,6 @@ export default function DemoWorkspace() {
         { title: "Transferencia por verificar", detail: "PED-DEMO-0190 · C$ 1,200.00", target: "caja" as ModuleId },
         { title: "Revisar segunda copia de respaldo", detail: "Copia externa · Estado ficticio pendiente", target: "administracion" as ModuleId },
       ].map((alert) => <article key={alert.title}><h3>{alert.title}</h3><p>{alert.detail}</p><button type="button" className="real-primary-button" onClick={() => { setAlertsOpen(false); setFollowingScenario(false); if (alert.target === "administracion") setAdministrationView("respaldos"); navigate(alert.target === "entregas" && state.mode === "simple" ? "ventas" : alert.target); }}>Abrir</button></article>)}</div><Facts items={[["Estado", "3 prioridades ficticias"], ["En el producto", "Alertas según permisos · Posponer · Marcar revisada · Restaurar"]]} /></DemoDialog>}
-      <p className="demo-hint"><span aria-hidden="true">↖</span> Explora registros y vistas previas con los controles habilitados. Seguir un pedido permite simular el flujo; recargar reinicia todos los datos.</p>
     </section>
   );
 }

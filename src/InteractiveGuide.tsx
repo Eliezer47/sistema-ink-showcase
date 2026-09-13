@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useState, type CSSProperties, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 
 export type GuideModuleId =
   | "panel"
@@ -163,6 +163,7 @@ export default function InteractiveGuide({ active, open, onClose, workspaceRef }
   const [stepIndex, setStepIndex] = useState(0);
   const [targetBox, setTargetBox] = useState<TargetBox | null>(null);
   const [cardTop, setCardTop] = useState(54);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const steps = useMemo(() => buildSteps(active), [active]);
   const safeStepIndex = Math.min(stepIndex, steps.length - 1);
   const step = steps[safeStepIndex];
@@ -173,8 +174,13 @@ export default function InteractiveGuide({ active, open, onClose, workspaceRef }
 
   useEffect(() => {
     if (!open) return;
+    closeButtonRef.current?.focus({ preventScroll: true });
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape" && !document.querySelector("dialog[open]")) onClose();
     };
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
@@ -187,6 +193,7 @@ export default function InteractiveGuide({ active, open, onClose, workspaceRef }
     if (!workspace) return;
     let describedTarget: HTMLElement | null = null;
     let previousDescription: string | null = null;
+    let revealedTarget = false;
 
     const restoreDescription = () => {
       if (!describedTarget) return;
@@ -220,6 +227,11 @@ export default function InteractiveGuide({ active, open, onClose, workspaceRef }
         restoreDescription();
         setTargetBox(null);
         return;
+      }
+
+      if (!revealedTarget) {
+        revealedTarget = true;
+        target.scrollIntoView({ block: "nearest", inline: "nearest" });
       }
 
       describeTarget(target);
@@ -281,7 +293,7 @@ export default function InteractiveGuide({ active, open, onClose, workspaceRef }
       <aside id="context-guide" className={`context-guide-card dock-${targetBox?.dock ?? "right"}`} style={{ "--guide-card-top": `${cardTop}px` } as CSSProperties} role="region" aria-label={`Guía de ${moduleGuide[active].label}`}>
         <header>
           <div><small>GUÍA CONTEXTUAL</small><strong>{moduleGuide[active].label}</strong></div>
-          <button type="button" onClick={onClose} aria-label="Cerrar guía">×</button>
+          <button ref={closeButtonRef} type="button" onClick={onClose} aria-label="Cerrar guía">×</button>
         </header>
         <div id="context-guide-message" className="context-guide-message" role="status" aria-live="polite" aria-atomic="true">
           <span>Paso {safeStepIndex + 1} de {steps.length}</span>

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { extname } from "node:path";
 import test from "node:test";
 
@@ -8,7 +8,9 @@ const candidates = execFileSync(
   "git",
   ["ls-files", "--cached", "--others", "--exclude-standard", "-z"],
   { encoding: "utf8" },
-).split("\0").filter(Boolean).map((path) => path.replaceAll("\\", "/"));
+).split("\0").filter(Boolean).map((path) => path.replaceAll("\\", "/"))
+  // Git still lists tracked files removed from the working tree before staging.
+  .filter((path) => existsSync(path));
 
 const forbiddenExtensions = new Set([
   ".bak", ".backup", ".cer", ".cs", ".csproj", ".db", ".der", ".dll", ".exe",
@@ -226,10 +228,9 @@ test("reflects the latest sales-relevant desktop changes without technical print
   assert.doesNotMatch(presentation, /CP850|CP858|GS_V0|GS_L|ESC_STAR|COMBINED_ESC_POS|WINDOWS_1252/u);
 });
 
-test("provides an accessible self-advancing feature carousel without product connectivity", () => {
+test("provides manual supplementary tabs without product connectivity", () => {
   const app = readFileSync("src/App.tsx", "utf8");
   const auxiliary = readFileSync("src/AuxiliaryViews.tsx", "utf8");
-  const css = readFileSync("src/globals.css", "utf8");
   const otherApplicationSource = candidates
     .filter((path) => /^src\/.*\.[cm]?[jt]sx?$/i.test(path) && path !== "src/AuxiliaryViews.tsx")
     .map((path) => readFileSync(path, "utf8"))
@@ -245,38 +246,18 @@ test("provides an accessible self-advancing feature carousel without product con
 
   assert.match(app, /import AuxiliaryViews from ["']\.\/AuxiliaryViews["']/u);
   assert.match(app, /<AuxiliaryViews\s*\/\s*>/u);
-  assert.match(auxiliary, /aria-roledescription="carrusel"/u);
-  assert.match(auxiliary, /aria-roledescription="diapositiva"/u);
-  assert.match(auxiliary, /aria-current=\{index === activeIndex/u);
+  assert.match(auxiliary, /role="tablist"/u);
+  assert.match(auxiliary, /role="tab"/u);
+  assert.match(auxiliary, /role="tabpanel"/u);
+  assert.match(auxiliary, /aria-selected=\{index === activeIndex/u);
+  assert.match(auxiliary, /aria-controls=/u);
   assert.match(auxiliary, /tabIndex=\{index === activeIndex \? 0 : -1\}/u);
   assert.match(auxiliary, /ArrowRight/u);
   assert.match(auxiliary, /ArrowLeft/u);
   assert.match(auxiliary, /event\.key === "Home"/u);
   assert.match(auxiliary, /event\.key === "End"/u);
-  assert.match(auxiliary, /aria-live=\{autoplayActive \? "off" : "polite"\}/u);
-
-  const intervalMatches = auxiliary.match(/window\.setInterval/g) ?? [];
-  assert.equal(intervalMatches.length, 1, "The feature carousel should own exactly one interval");
-  assert.match(auxiliary, /window\.clearInterval\(interval\)/u);
-  assert.doesNotMatch(auxiliary, /setTimeout|requestAnimationFrame/u);
+  assert.doesNotMatch(auxiliary, /setInterval|setTimeout|requestAnimationFrame/u);
   assert.doesNotMatch(otherApplicationSource, /setInterval/u);
-
-  const delay = auxiliary.match(/const AUTO_ADVANCE_MS = (\d+);/u);
-  assert.ok(delay, "Missing explicit carousel delay");
-  assert.ok(Number(delay[1]) >= 7000 && Number(delay[1]) <= 10000, "Carousel delay should remain calm and readable");
-  assert.match(auxiliary, /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/u);
-  assert.match(auxiliary, /document\.hidden/u);
-  assert.match(auxiliary, /visibilitychange/u);
-  assert.match(auxiliary, /removeEventListener\("visibilitychange"/u);
-  assert.match(auxiliary, /IntersectionObserver/u);
-  assert.match(auxiliary, /observer\.disconnect\(\)/u);
-  assert.match(auxiliary, /onPointerEnter/u);
-  assert.match(auxiliary, /onPointerLeave/u);
-  assert.match(auxiliary, /onFocusCapture/u);
-  assert.match(auxiliary, /onBlurCapture/u);
-  assert.match(auxiliary, /Pausar recorrido automático/u);
-  assert.match(auxiliary, /Reanudar recorrido automático/u);
-  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.feature-carousel__slide[\s\S]*?animation:\s*none/is);
 
   assert.match(auxiliary, /Impresora Oficina DEMO/u);
   assert.match(auxiliary, /Térmica Caja DEMO/u);
@@ -295,21 +276,15 @@ test("provides an accessible self-advancing feature carousel without product con
   assert.ok(operationalButtons.length >= 16, "Expected feature-preview operational controls to remain disabled");
 });
 
-test("explains product benefits while preserving the public-demo boundary", () => {
+test("keeps the demo scope available on demand without a marketing landing page", () => {
   const app = readFileSync("src/App.tsx", "utf8");
-  const benefits = readFileSync("src/BenefitsSection.tsx", "utf8");
-
-  assert.match(app, /import BenefitsSection from ["']\.\/BenefitsSection["']/u);
-  assert.match(app, /<BenefitsSection\s*\/\s*>/u);
-  for (const benefit of [
-    "Todo el flujo conserva su contexto", "Impresión lista para cada estación",
-    "Control sin perder continuidad",
+  for (const notice of [
+    "Datos ficticios · Operaciones simuladas", "Acerca de esta demo",
+    "Referencia del sistema · 1.10.3", "Sin conexión al producto comercial",
+    "Impresión física, permisos, respaldos y trabajo multiusuario",
+    "demostración del sistema instalado",
   ]) {
-    assert.match(benefits, new RegExp(benefit, "u"), "Missing benefit explanation: " + benefit);
+    assert.ok(app.includes(notice), "Missing demo scope information: " + notice);
   }
-  assert.match(benefits, /Las simulaciones usan datos ficticios/u);
-  assert.match(benefits, /Carta\/A4/u);
-  assert.match(benefits, /58 u 80 mm/u);
-  assert.match(benefits, /aria-labelledby="benefits-title"/u);
-  assert.match(benefits, /aria-describedby="benefits-description"/u);
+  assert.doesNotMatch(app, /BenefitsSection|className="hero"|trust-section/u);
 });

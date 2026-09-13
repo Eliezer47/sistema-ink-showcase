@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ComponentType, type KeyboardEvent } from "react";
+import { useRef, useState, type ComponentType, type KeyboardEvent } from "react";
 
 type AuxiliaryViewId = "login" | "server" | "pin" | "printing" | "receipt" | "connection";
 
@@ -7,7 +7,6 @@ type AuxiliaryViewDefinition = {
   label: string;
   title: string;
   purpose: string;
-  benefit: string;
 };
 
 const auxiliaryViews: readonly AuxiliaryViewDefinition[] = [
@@ -16,42 +15,36 @@ const auxiliaryViews: readonly AuxiliaryViewDefinition[] = [
     label: "Acceso",
     title: "Cada usuario entra con su propia cuenta.",
     purpose: "La estación muestra el servidor disponible y permite ingresar con contraseña. El usuario puede recordarse sin guardar la clave.",
-    benefit: "Inicio ágil y operaciones identificadas por usuario.",
   },
   {
     id: "server",
     label: "Servidor",
     title: "El servidor se encuentra desde la aplicación.",
     purpose: "Las estaciones disponibles aparecen en una lista clara y también puede indicarse un equipo manualmente durante la instalación.",
-    benefit: "Facilita agregar o recuperar puestos de trabajo.",
   },
   {
     id: "pin",
     label: "PIN",
     title: "Un acceso más rápido en el equipo habitual.",
     purpose: "El usuario puede configurar un PIN de seis dígitos y conservar la contraseña como alternativa.",
-    benefit: "Menos pasos diarios manteniendo una cuenta por persona.",
   },
   {
     id: "printing",
     label: "Impresión",
     title: "Cada documento sale en el formato adecuado.",
     purpose: "La estación puede usar una impresora para Carta o A4 y otra para recibos térmicos, con prueba directa y vista previa.",
-    benefit: "Reportes y bauchers separados sin reconfigurar cada impresión.",
   },
   {
     id: "receipt",
     label: "Baucher",
     title: "Recibos térmicos adaptados al mostrador.",
     purpose: "El baucher admite papel de 58 y 80 mm, logo, identificación de caja, mensaje final y opciones para equipos compatibles.",
-    benefit: "Una salida compacta y reconocible, lista para entregar al cliente.",
   },
   {
     id: "connection",
     label: "Continuidad",
     title: "Si la conexión falla, el sistema lo hace evidente.",
     purpose: "La zona de trabajo se pausa y conserva el contexto visible mientras se comprueba la comunicación con el servidor.",
-    benefit: "Reduce el riesgo de continuar una operación que no puede confirmarse.",
   },
 ];
 
@@ -275,155 +268,45 @@ const previews: Record<AuxiliaryViewId, ComponentType> = {
   connection: ConnectionPreview,
 };
 
-const AUTO_ADVANCE_MS = 8000;
-
 export default function AuxiliaryViews() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [manualPause, setManualPause] = useState(false);
-  const [interactionPause, setInteractionPause] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [isDocumentVisible, setIsDocumentVisible] = useState(true);
-  const [isInViewport, setIsInViewport] = useState(false);
-  const [announcement, setAnnouncement] = useState("");
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const pagerRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const activeView = auxiliaryViews[activeIndex];
   const ActivePreview = previews[activeView.id];
-  const autoplayActive = !manualPause
-    && !interactionPause
-    && !prefersReducedMotion
-    && isDocumentVisible
-    && isInViewport;
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
-    updatePreference();
-    mediaQuery.addEventListener("change", updatePreference);
-    return () => mediaQuery.removeEventListener("change", updatePreference);
-  }, []);
-
-  useEffect(() => {
-    const updateVisibility = () => setIsDocumentVisible(!document.hidden);
-    updateVisibility();
-    document.addEventListener("visibilitychange", updateVisibility);
-    return () => document.removeEventListener("visibilitychange", updateVisibility);
-  }, []);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-    if (!("IntersectionObserver" in window)) {
-      setIsInViewport(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsInViewport(entry.isIntersecting),
-      { threshold: 0.35 },
-    );
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!autoplayActive) return;
-    const interval = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % auxiliaryViews.length);
-    }, AUTO_ADVANCE_MS);
-    return () => window.clearInterval(interval);
-  }, [autoplayActive, activeIndex]);
-
-  const selectView = (index: number, moveFocus = false) => {
-    const nextIndex = (index + auxiliaryViews.length) % auxiliaryViews.length;
-    setActiveIndex(nextIndex);
-    setAnnouncement("Vista " + (nextIndex + 1) + " de " + auxiliaryViews.length + ": " + auxiliaryViews[nextIndex].label);
-    if (moveFocus) pagerRefs.current[nextIndex]?.focus();
-  };
-
-  const handlePagerKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     let nextIndex: number | undefined;
-    if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = (index + 1) % auxiliaryViews.length;
-    if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = (index - 1 + auxiliaryViews.length) % auxiliaryViews.length;
+    if (event.key === "ArrowRight") nextIndex = (index + 1) % auxiliaryViews.length;
+    if (event.key === "ArrowLeft") nextIndex = (index - 1 + auxiliaryViews.length) % auxiliaryViews.length;
     if (event.key === "Home") nextIndex = 0;
     if (event.key === "End") nextIndex = auxiliaryViews.length - 1;
     if (nextIndex === undefined) return;
     event.preventDefault();
-    selectView(nextIndex, true);
+    setActiveIndex(nextIndex);
+    tabRefs.current[nextIndex]?.focus();
   };
 
   return (
-    <section
-      aria-labelledby="feature-carousel-title"
-      aria-roledescription="carrusel"
-      className="feature-carousel"
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setInteractionPause(false);
-      }}
-      onFocusCapture={() => setInteractionPause(true)}
-      onPointerEnter={() => setInteractionPause(true)}
-      onPointerLeave={() => setInteractionPause(false)}
-      ref={sectionRef}
-      role="region"
-    >
-      <header className="feature-carousel__header">
-        <div>
-          <p className="aux-eyebrow">Funciones que completan la experiencia</p>
-          <h2 id="feature-carousel-title">Detalles que hacen más simple el trabajo diario.</h2>
-          <p>Acceso, conexión e impresión, presentados tal como se reconocen dentro del sistema.</p>
-        </div>
-        <p className="feature-carousel__boundary">Vista ilustrativa · Datos ficticios · Sin conexiones ni impresiones</p>
-      </header>
-
-      <article
-        aria-label={(activeIndex + 1) + " de " + auxiliaryViews.length}
-        aria-roledescription="diapositiva"
-        className="feature-carousel__slide"
-        id="feature-active-slide"
-        key={activeView.id}
-        role="group"
-      >
-        <div className="feature-carousel__copy">
-          <span className="feature-carousel__label">{activeView.label}</span>
-          <h3>{activeView.title}</h3>
-          <p>{activeView.purpose}</p>
-          <p className="feature-carousel__benefit"><strong>En la operación</strong>{activeView.benefit}</p>
-        </div>
-        <div className="feature-carousel__stage">
-          <ActivePreview />
-        </div>
-      </article>
-
-      <div className="feature-carousel__controls">
-        <button aria-controls="feature-active-slide" className="feature-carousel__arrow" onClick={() => selectView(activeIndex - 1)} type="button">←<span>Anterior</span></button>
-        <div aria-label="Elegir vista" className="feature-carousel__pager" role="group">
-          {auxiliaryViews.map((view, index) => (
-            <button
-              aria-current={index === activeIndex ? "true" : undefined}
-              aria-label={"Mostrar " + view.label}
-              key={view.id}
-              onClick={() => selectView(index)}
-              onKeyDown={(event) => handlePagerKeyDown(event, index)}
-              ref={(element) => { pagerRefs.current[index] = element; }}
-              tabIndex={index === activeIndex ? 0 : -1}
-              type="button"
-            >
-              <span />
-            </button>
-          ))}
-        </div>
-        <span className="feature-carousel__count">{String(activeIndex + 1).padStart(2, "0")} / {String(auxiliaryViews.length).padStart(2, "0")}</span>
-        <button
-          aria-label={manualPause ? "Reanudar recorrido automático" : "Pausar recorrido automático"}
-          className="feature-carousel__pause"
-          disabled={prefersReducedMotion}
-          onClick={() => setManualPause((current) => !current)}
+    <section className="supplementary-views" aria-label="Vistas complementarias">
+      <div className="supplementary-tabs" role="tablist" aria-label="Elegir vista">
+        {auxiliaryViews.map((view, index) => <button
+          key={view.id}
+          id={"aux-tab-" + view.id}
+          role="tab"
+          aria-selected={index === activeIndex}
+          aria-controls={"aux-panel-" + view.id}
+          tabIndex={index === activeIndex ? 0 : -1}
+          ref={(element) => { tabRefs.current[index] = element; }}
+          onClick={() => setActiveIndex(index)}
+          onKeyDown={(event) => handleTabKeyDown(event, index)}
           type="button"
-        >
-          {prefersReducedMotion ? "Movimiento reducido" : manualPause ? "Reanudar" : "Pausar"}
-        </button>
-        <button aria-controls="feature-active-slide" className="feature-carousel__arrow" onClick={() => selectView(activeIndex + 1)} type="button"><span>Siguiente</span>→</button>
+        >{view.label}</button>)}
       </div>
-      <span aria-live={autoplayActive ? "off" : "polite"} className="sr-only" role="status">{announcement}</span>
+      <div id={"aux-panel-" + activeView.id} role="tabpanel" aria-labelledby={"aux-tab-" + activeView.id} tabIndex={0} key={activeView.id}>
+        <h3>{activeView.title}</h3>
+        <p>{activeView.purpose}</p>
+        <div className="supplementary-stage"><ActivePreview /></div>
+      </div>
     </section>
   );
 }

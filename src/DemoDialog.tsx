@@ -1,16 +1,24 @@
 import { useEffect, useRef, type ReactNode } from "react";
 
-export default function DemoDialog({ title, onClose, children, wide = false }: { title: string; onClose: () => void; children: ReactNode; wide?: boolean }) {
+export default function DemoDialog({ title, onClose, children, wide = false, closeLabel = "Cerrar vista previa", footer = "Vista de ejemplo · Datos ficticios · Sin impresión ni envío" }: {
+  title: string; onClose: () => void; children: ReactNode; wide?: boolean; closeLabel?: string; footer?: string;
+}) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const dialog = ref.current;
+    const previousFocus = document.activeElement;
     dialog?.showModal();
-    return () => dialog?.close();
+    return () => {
+      dialog?.close();
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
+        previousFocus.focus({ preventScroll: true });
+      }
+    };
   }, []);
   return <dialog ref={ref} className={`demo-dialog${wide ? " wide" : ""}`} aria-label={title} onCancel={onClose}>
-    <header><h2>{title}</h2><button type="button" onClick={onClose} aria-label="Cerrar vista previa">×</button></header>
+    <header><h2>{title}</h2><button type="button" onClick={onClose} aria-label={closeLabel}>×</button></header>
     <div className="demo-dialog-body">{children}</div>
-    <footer>Vista de ejemplo · Datos ficticios · Sin impresión ni envío</footer>
+    <footer>{footer}</footer>
   </dialog>;
 }
 

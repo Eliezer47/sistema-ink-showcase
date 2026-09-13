@@ -83,7 +83,7 @@ test("mirrors the current public menu hierarchy without hidden direct entries", 
 
   for (const label of [
     "Panel principal", "Métricas", "Ventas", "Caja", "Producción", "Clientes", "Cotizaciones",
-    "Control de entregas", "Artículos del cliente", "Calidad", "Finanzas", "Compras",
+    "Entregas", "Disponibilidad", "Calculadora de costos", "Artículos del cliente", "Calidad", "Finanzas", "Compras",
     "Inventario", "Catálogo", "Administración", "MÁS OPCIONES",
   ]) {
     assert.match(source, new RegExp(label, "u"), `Missing current menu label: ${label}`);
@@ -106,7 +106,7 @@ test("mirrors the current public menu hierarchy without hidden direct entries", 
 
 test("provides distinct internal screens and an accessible contextual guide", () => {
   const workspace = readFileSync("src/DemoWorkspace.tsx", "utf8");
-  const internalViews = readFileSync("src/InternalViews.tsx", "utf8");
+  const internalViews = readFileSync("src/InternalViews.tsx", "utf8") + readFileSync("src/AdditionalInternalViews.tsx", "utf8");
   const guide = readFileSync("src/InteractiveGuide.tsx", "utf8");
   const css = readFileSync("src/globals.css", "utf8");
 
@@ -114,13 +114,14 @@ test("provides distinct internal screens and an accessible contextual guide", ()
     "Empresa", "Usuarios", "Roles y permisos", "Equipos conectados",
     "Métricas de ventas", "Estación e impresión", "Respaldos y diagnóstico",
     "Productos y servicios", "Categorías", "Unidades", "Recetas y costos", "Proveedores",
+    "Cajas físicas", "Auditoría", "Diseño y navegación", "Puesta en marcha", "Atributos", "Familias y variantes", "Acciones operativas", "Perfiles de personalización",
   ]) {
     assert.match(internalViews, new RegExp(view, "u"), `Missing internal demo screen: ${view}`);
   }
 
   for (const id of [
     "panel", "metricas", "ventas", "caja", "produccion", "clientes", "cotizaciones", "entregas",
-    "articulos", "calidad", "finanzas", "compras", "inventario", "catalogo", "administracion",
+    "articulos", "calidad", "finanzas", "compras", "inventario", "catalogo", "administracion", "calculadora", "disponibilidad",
   ]) {
     assert.match(guide, new RegExp(`\\b${id}:\\s*\\{`, "u"), `Missing contextual guide module: ${id}`);
   }
@@ -130,10 +131,10 @@ test("provides distinct internal screens and an accessible contextual guide", ()
   assert.match(workspace, /aria-current=\{activeInternal === item\.id \? "page"/u);
   assert.match(workspace, /resetInternalScroll/u);
   assert.match(workspace, /internal-view-host/u);
-  for (const viewId of ["empresa", "usuarios", "roles", "equipos", "metricas-ventas", "estacion", "respaldos"]) {
+  for (const viewId of ["empresa", "usuarios", "roles", "equipos", "metricas-ventas", "estacion", "respaldos", "cajas", "auditoria", "diseno", "inicio"]) {
     assert.match(internalViews, new RegExp(`case ["']${viewId}["']`, "u"), `Missing explicit Administration dispatch: ${viewId}`);
   }
-  for (const viewId of ["productos", "categorias", "unidades", "recetas", "proveedores"]) {
+  for (const viewId of ["productos", "categorias", "unidades", "recetas", "proveedores", "atributos", "familias", "acciones", "personalizacion"]) {
     assert.match(internalViews, new RegExp(`case ["']${viewId}["']`, "u"), `Missing explicit Catalog dispatch: ${viewId}`);
   }
   assert.match(workspace, /import InteractiveGuide/u);
@@ -145,7 +146,7 @@ test("provides distinct internal screens and an accessible contextual guide", ()
     assert.match(workspace, new RegExp(`data-guide-target[^\\n]{0,120}["']${target}["']`, "u"), `Missing guide anchor: ${target}`);
   }
 
-  const interactiveSource = `${workspace}\n${internalViews}`;
+  const interactiveSource = `${workspace}\n${internalViews}\n${readFileSync("src/DemoPrimitives.tsx", "utf8")}`;
   for (const target of [
     "module-header", "module-metrics", "flow-toolbar", "workflow-columns", "workspace-tabs",
     "module-filter", "record-list", "selected-record", "record-detail",
@@ -207,10 +208,10 @@ test("reflects the latest sales-relevant desktop changes without technical print
   const workspace = readFileSync("src/DemoWorkspace.tsx", "utf8");
   const internalViews = readFileSync("src/InternalViews.tsx", "utf8");
   const auxiliary = readFileSync("src/AuxiliaryViews.tsx", "utf8");
-  const presentation = internalViews + "\n" + auxiliary;
+  const presentation = internalViews + "\n" + auxiliary + "\n" + readFileSync("src/StationExamples.tsx", "utf8");
 
-  for (const cashLabel of ["Cerrar caja 20/07", "Retiro", "Cierre diario"]) {
-    assert.match(workspace, new RegExp(cashLabel, "u"));
+  for (const cashLabel of ["Cerrar caja 11/09", "Retiro", "Cierre diario"]) {
+    assert.match(readFileSync("src/OperationalModules.tsx", "utf8"), new RegExp(cashLabel, "u"));
   }
 
   for (const label of [
@@ -306,7 +307,7 @@ test("explains product benefits while preserving the public-demo boundary", () =
   ]) {
     assert.match(benefits, new RegExp(benefit, "u"), "Missing benefit explanation: " + benefit);
   }
-  assert.match(benefits, /Alcance visual con datos ficticios; las funciones operativas no forman parte de este repositorio público/u);
+  assert.match(benefits, /Las simulaciones usan datos ficticios/u);
   assert.match(benefits, /Carta\/A4/u);
   assert.match(benefits, /58 u 80 mm/u);
   assert.match(benefits, /aria-labelledby="benefits-title"/u);

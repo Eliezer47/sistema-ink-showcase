@@ -50,8 +50,11 @@ test("build contains the isolated InkGestión visual showcase", async () => {
   assert.match(javascript, /Todo el flujo conserva su contexto/i);
   assert.match(javascript, /Impresión lista para cada estación/i);
   assert.match(javascript, /Control sin perder continuidad/i);
-  assert.match(javascript, /Alcance visual con datos ficticios/i);
+  assert.match(javascript, /Las simulaciones usan datos ficticios/i);
   assert.match(javascript, /carrusel/i);
+  for (const label of ["Seguir un pedido", "Ventas rápidas", "Cobro rápido", "Calculadora de costos", "Disponibilidad rápida", "Familias y variantes", "Auditoría", "Registrar para verificar"]) {
+    assert.ok(javascript.includes(label), `Missing new capability: ${label}`);
+  }
   assert.doesNotMatch(javascript, /Entiende el flujo, módulo por módulo/i);
   assert.doesNotMatch(javascript, /localhost:5114|Bearer\s|SistemaInk\.Contracts/i);
 });

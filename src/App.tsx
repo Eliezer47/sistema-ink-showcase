@@ -1,6 +1,7 @@
 import DemoWorkspace from "./DemoWorkspace";
 import AuxiliaryViews from "./AuxiliaryViews";
 import BenefitsSection from "./BenefitsSection";
+import { DemoSession } from "./DemoSession";
 
 export default function App() {
   return (
@@ -16,9 +17,9 @@ export default function App() {
             <span> en una sola vista.</span>
           </h1>
           <p className="hero-lead">
-            Un recorrido visual por InkGestión, una solución creada para ordenar la
-            operación de Ink Multiservicios. Explora la interfaz con información
-            totalmente ficticia y sin conectarte al producto real.
+            Conoce InkGestión, la solución para coordinar ventas, caja, producción
+            y entregas de Ink Multiservicios. Explora sus pantallas y sigue un pedido
+            de ejemplo desde la cotización hasta la entrega.
           </p>
         </div>
 
@@ -26,12 +27,12 @@ export default function App() {
           <span className="notice-dot" aria-hidden="true" />
           <div>
             <strong>Demo visual aislada</strong>
-            <p>Sin acceso al servidor comercial, base de datos, cuentas reales ni acciones operativas.</p>
+            <p>Recreación web del sistema de escritorio, con datos ficticios y operaciones simuladas. Referencia: versión 1.10.3.</p>
           </div>
         </aside>
       </section>
 
-      <DemoWorkspace />
+      <DemoSession><DemoWorkspace /></DemoSession>
 
       <AuxiliaryViews />
 
@@ -39,14 +40,14 @@ export default function App() {
 
       <section className="trust-section" aria-labelledby="trust-title">
         <div>
-          <p className="eyebrow">Diseñada para mostrar, no para operar</p>
-          <h2 id="trust-title">Una presentación pública con límites claros.</h2>
-          <p className="trust-intro">La demo permite evaluar la experiencia visual sin publicar el producto que la hace funcionar.</p>
+          <p className="eyebrow">Conoce el alcance antes de decidir</p>
+          <h2 id="trust-title">Explora el sistema con un ejemplo seguro.</h2>
+          <p className="trust-intro">La demo representa pantallas y recorridos de la versión 1.10.3. La instalación real agrega los usuarios, permisos, documentos, impresoras y datos de tu negocio.</p>
         </div>
         <div className="trust-list">
           <p><strong>Datos sintéticos.</strong> Nombres, pedidos, importes y estados fueron creados para esta presentación.</p>
-          <p><strong>Solo lectura.</strong> Guardar, cobrar, exportar, imprimir y administrar permanecen deshabilitados.</p>
-          <p><strong>Producto protegido.</strong> El repositorio no contiene API, base de datos ni reglas internas del sistema.</p>
+          <p><strong>Un ejemplo reiniciable.</strong> Los cobros y entregas del recorrido solo cambian datos ficticios. Recargar restaura el inicio.</p>
+          <p><strong>Validación en tu negocio.</strong> La demo no acredita instalación, rendimiento, impresión física o seguridad. Esas capacidades se revisan en una demostración privada del producto.</p>
         </div>
       </section>
 

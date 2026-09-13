@@ -1,7 +1,10 @@
 import type { ReactNode } from "react";
+import AdditionalInternalViews, { type ExtraAdministrationId, type ExtraCatalogId } from "./AdditionalInternalViews";
+import DemoControls from "./DemoControls";
+import { StationExamples, CatalogProductExtras } from "./StationExamples";
 
-export type AdministrationViewId = "empresa" | "usuarios" | "roles" | "equipos" | "metricas-ventas" | "estacion" | "respaldos";
-export type CatalogViewId = "productos" | "categorias" | "unidades" | "recetas" | "proveedores";
+export type AdministrationViewId = ExtraAdministrationId | "empresa" | "usuarios" | "roles" | "equipos" | "metricas-ventas" | "estacion" | "respaldos";
+export type CatalogViewId = ExtraCatalogId | "productos" | "categorias" | "unidades" | "recetas" | "proveedores";
 
 type Metric = {
   label: string;
@@ -72,6 +75,7 @@ function CompanyView() {
         <section className="company-data-column" data-guide-target="record-detail">
           <h3>Datos del negocio</h3><div className="internal-field-grid"><Field label="Razón social" value="Atelier Demostración S.A." /><Field label="Nombre comercial" value="Atelier Demo" /><Field label="RUC" value="DEMO-J031000042" /><Field label="Teléfono" value="+505 2222 0101" /><Field label="Correo" value="hola@atelier.example" /><Field label="Sitio web" value="atelier.example" /><Field label="Contacto principal" value="Marina Soto" wide /><Field label="Dirección" value="Distrito Creativo · Ubicación ficticia" wide /></div>
           <section className="internal-card company-settings-card"><h3>Entregas y totales</h3><div className="internal-field-grid"><Field label="Departamento" value="Managua DEMO" /><Field label="Ciudad" value="Ciudad ficticia" /><Field label="Envío fuera de la ciudad" value="C$ 120.00" /><Field label="Redondeo" value="Siguiente C$ 1" /><Field label="Mensaje de pedido listo" value="Plantilla ilustrativa para aviso al cliente" wide /></div></section>
+          <section className="internal-card company-settings-card"><h3>Modo de operación</h3><DemoControls /><p>Simple oculta Producción y Entregas del menú principal. Cobrar el saldo puede preparar el trabajo; la entrega física se confirma aparte.</p></section>
           <section className="internal-card company-settings-card fiscal-card"><h3>Configuración fiscal</h3><div className="internal-field-grid"><Field label="Régimen tributario" value="Configuración de muestra" /><Field label="IVA" value="Tasa ficticia · No calculada" /><Field label="Retenciones" value="Solo referencia visual" wide /></div></section>
         </section>
       </div>
@@ -99,7 +103,7 @@ function UsersView() {
           <div className="internal-field-grid one-column">
             <Field label="Usuario" value="marina.demo" />
             <Field label="Nombre para mostrar" value="Marina Soto" />
-            <Field label="Rol" value="Administración" />
+            <Field label="Rol" value="Administración" /><Field label="Acceso integrado de Windows" value="Configurable por usuario · No conectado en la demo" />
             <Field label="Código temporal" value="6 dígitos · un solo uso" />
           </div>
           <div className="user-security-note">El código temporal es distinto del PIN. El usuario crea su contraseña segura al ingresar y la cuenta principal permanece protegida.</div>
@@ -204,6 +208,7 @@ function StationView() {
         </section>
       </div>
       <div className="internal-action-row station-actions"><DemoButton>Descartar cambios</DemoButton><DemoButton primary>Guardar estación</DemoButton></div>
+    <StationExamples />
     </Screen>
   );
 }
@@ -216,8 +221,8 @@ function BackupsView() {
   ];
   return (
     <Screen section="ADMINISTRACIÓN" title="Respaldos y diagnóstico" description="Protección automática, estado del servidor e historial verificable." action="Actualizar" metrics={[{ label: "Servidor", value: "Disponible", tone: "success" }, { label: "Base de datos", value: "Demo", tone: "success" }, { label: "Almacenamiento", value: "Local" }, { label: "Último respaldo", value: "Ejecución demo" }]}>
-      <section className="internal-card backup-schedule" data-guide-target="record-detail"><div className="setting-title"><div><h3>Programación automática</h3><p className="internal-copy">Próxima ejecución: horario sintético de demostración.</p></div><span className="fake-switch is-on" aria-hidden="true" /></div><div className="internal-field-grid"><Field label="Frecuencia" value="Programada" /><Field label="Hora" value="Configuración demo" /><Field label="Día" value="Periodo ilustrativo" /><Field label="Retención" value="Historial ficticio" /></div><div className="internal-action-row"><DemoButton>Descartar</DemoButton><DemoButton primary>Guardar programación</DemoButton></div></section>
-      <div className="backup-action-grid"><section className="internal-card"><h3>Respaldo manual</h3><p className="internal-copy">Crea una copia de muestra en el almacenamiento configurado.</p><DemoButton primary>Crear respaldo</DemoButton></section><section className="internal-card"><h3>Restaurar respaldo</h3><p className="internal-copy">Esta acción permanece deshabilitada en la presentación pública.</p><DemoButton>Seleccionar archivo…</DemoButton></section></div>
+      <section className="internal-card backup-schedule" data-guide-target="record-detail"><div className="setting-title"><div><h3>Programación automática</h3><p>Respaldo verificado · Segunda copia externa · Prueba periódica de restauración</p><p className="internal-copy">Próxima ejecución: horario sintético de demostración.</p></div><span className="fake-switch is-on" aria-hidden="true" /></div><div className="internal-field-grid"><Field label="Frecuencia" value="Programada" /><Field label="Hora" value="Configuración demo" /><Field label="Día" value="Periodo ilustrativo" /><Field label="Retención" value="Historial ficticio" /></div><div className="internal-action-row"><DemoButton>Descartar</DemoButton><DemoButton primary>Guardar programación</DemoButton></div></section>
+      <div className="backup-action-grid"><section className="internal-card"><h3>Respaldo manual</h3><p className="internal-copy">El producto crea un paquete verificado. Esta vista muestra únicamente su organización.</p><DemoButton primary>Crear respaldo</DemoButton></section><section className="internal-card"><h3>Restaurar respaldo</h3><p className="internal-copy">Esta acción permanece deshabilitada en la presentación pública.</p><DemoButton>Seleccionar archivo…</DemoButton></section></div>
       <section className="internal-card backup-history"><div className="internal-card-heading"><div><h3>Historial</h3><p className="internal-copy">La tabla usa únicamente archivos y estados ficticios.</p></div></div><Table headers={["Inicio", "Origen", "Estado", "Tamaño", "Detalle"]} rows={rows} /></section>
     </Screen>
   );
@@ -232,7 +237,7 @@ function ProductsView() {
   return (
     <Screen section="CATÁLOGO" title="Productos y servicios" description="Conceptos comerciales, costos y precios vigentes." actions={<div className="internal-screen-actions"><DemoButton>Plantilla</DemoButton><DemoButton>Importar</DemoButton><DemoButton primary>Nuevo concepto</DemoButton></div>}>
       <div className="internal-screen-grid product-grid"><section><div className="fake-input internal-search">Buscar código o nombre…</div><div className="catalog-filter-row"><Badge tone="success">Activos</Badge><Badge>Inactivos</Badge><Badge>Todos</Badge><span /><Badge>Producto</Badge><Badge>Servicio</Badge><Badge>Cargo</Badge></div><Table headers={["Código", "Nombre", "Tipo", "Unidad", "Activo"]} rows={rows} /></section><aside className="internal-card internal-editor" data-guide-target="record-detail"><div className="internal-card-heading"><div><h3>Taza personalizada 11 oz</h3><p className="internal-copy">PRO-DEMO-032 · Producto ficticio seleccionado</p></div><DemoButton>Editar</DemoButton></div><div className="internal-field-grid"><Field label="Categoría" value="Promocionales" /><Field label="Unidad" value="Unidad" /><Field label="Costo estimado" value="C$ 78.00" /><Field label="Precio público" value="C$ 145.00" /><Field label="Características" value="Inventario · Personalizable" wide /></div><h4 className="permission-heading">Presentaciones</h4><Table headers={["Presentación", "Unidad", "Factor", "Pred."]} rows={[["Caja DEMO", "UND", "12.0000", "Sí"], ["Unidad", "UND", "1.0000", "No"]]} /></aside></div>
-    </Screen>
+    <CatalogProductExtras /></Screen>
   );
 }
 
@@ -294,6 +299,7 @@ export default function InternalViewContent(props: InternalViewContentProps) {
       case "metricas-ventas": return <SalesMetricsView />;
       case "estacion": return <StationView />;
       case "respaldos": return <BackupsView />;
+      case "cajas": case "auditoria": case "diseno": case "inicio": return <AdditionalInternalViews view={props.activeView} />;
     }
   }
 
@@ -303,5 +309,6 @@ export default function InternalViewContent(props: InternalViewContentProps) {
     case "unidades": return <UnitsView />;
     case "recetas": return <RecipesView />;
     case "proveedores": return <SuppliersView />;
+    case "atributos": case "familias": case "acciones": case "personalizacion": return <AdditionalInternalViews view={props.activeView} />;
   }
 }

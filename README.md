@@ -1,77 +1,56 @@
-# InkGestión — Showcase visual
+# InkGestión — Demo del sistema
 
 ![Portada del recorrido visual de InkGestión](public/og.png)
 
-Recorrido público y deliberadamente limitado de **InkGestión**, una solución de gestión creada para Ink Multiservicios.
+Demostración pública de **InkGestión**, basada en la versión de escritorio **1.10.3**. Incluye pantallas recreadas y un pedido interactivo con datos ficticios. El [análisis de fidelidad](docs/fidelidad-demo.md) documenta la comparación, los cambios y los límites de la presentación.
 
-Este repositorio muestra una recreación visual independiente con datos sintéticos. **No contiene el código del producto comercial**, sus reglas de negocio, API, contratos, base de datos, autenticación, instaladores ni documentación técnica interna.
+Este repositorio es independiente del producto comercial. No contiene sus servicios, base de datos, autenticación, instaladores ni código de negocio.
 
-## Qué incluye
+## Qué puede probar un prospecto
 
-- Los 15 módulos visibles del menú actual: Panel principal, Métricas, Ventas, Caja,
-  Producción, Clientes, Cotizaciones, Control de entregas, Artículos del
-  cliente, Calidad, Finanzas, Compras, Inventario, Catálogo y Administración.
-- Pantallas ficticias diferenciadas para las siete opciones de Administración
-  y las cinco opciones de Catálogo, incluidas Métricas de ventas y Proveedores.
-- Una vista de Compras con indicadores de recepción, listado y detalle visual.
-- Configuración diferenciada para documentos Carta/A4 y bauchers térmicos de
-  58 u 80 mm, con prueba y vista previa únicamente ilustrativas.
-- Seis vistas complementarias para conocer el acceso, la selección del servidor,
-  el PIN, la impresión por estación, el baucher térmico y el estado sin conexión.
-- Una síntesis comercial del flujo integrado, la impresión, el control de
-  accesos y la continuidad operativa.
-- Una guía contextual integrada en la ventana de la demostración. Se adapta al
-  módulo activo y señala el menú, las subopciones, el área de trabajo y el
-  estado del entorno sin bloquear la navegación.
-- Datos, estados, importes, usuarios, equipos y referencias exclusivamente
-  sintéticos.
+- **Explorar pantallas:** navegar por 16 módulos y abrir la consulta de Disponibilidad mediante el menú o F3. Catálogo contiene nueve apartados; Administración, once; Finanzas, siete. Los accesos opcionales de Calculadora, Artículos del cliente y Calidad están habilitados en este perfil de demostración.
+- **Seguir un pedido:** aprobar una cotización, convertirla, registrar abonos o transferencias ficticias, verificar el cobro, preparar el trabajo y entregar total o parcialmente. Ventas, Caja, Producción, Entregas, Inventario, Disponibilidad y la cuenta por cobrar comparten el estado de ese ejemplo.
+- **Comparar Simple y Por áreas:** Simple oculta Producción y Entregas del menú y permite confirmar toda la entrega pendiente desde Ventas o Caja. Las políticas de preparación automática y verificación de transferencias se prueban en Administración > Empresa.
+- **Buscar y seleccionar registros** en las listas habilitadas, abrir ejemplos de cotización, recibo, resumen y etiquetas, y calcular un escenario de costos con tarifas sintéticas.
+- **Consultar la guía** contextual y seis vistas complementarias sobre acceso, servidor, PIN, impresión, baucher y pérdida de conexión.
 
-La navegación entre módulos, subpantallas y pasos de la guía funciona únicamente
-en memoria. La guía se abre desde el botón **Guía** de la barra superior y
-permanece dentro de la interfaz. Las vistas complementarias avanzan cada ocho
-segundos y pueden pausarse; también se detienen al enfocarlas, al colocar el
-puntero encima, al salir de la ventana visible o cuando el sistema solicita
-movimiento reducido. Los botones operativos están deshabilitados y recargar la
-página restaura la vista inicial.
+Los botones deshabilitados representan funciones disponibles únicamente en el producto instalado. Los ejemplos de Explorar pantallas son ilustraciones; el estado compartido corresponde a Seguir un pedido. Reiniciar ejemplo restaura el pedido y conserva las políticas elegidas; recargar restaura toda la demostración.
 
-## Límites deliberados
+## Límites
 
-- Sin conexión a servicios del producto comercial.
-- Sin base de datos, cuentas, autenticación, telemetría o almacenamiento del navegador.
-- Sin acciones de guardar, cobrar, exportar, restaurar o administrar.
-- Sin datos tomados de personas, empresas, pedidos o instalaciones reales.
-- Sin código XAML, .NET, SQL, contratos, endpoints o binarios del producto.
+- Sin conexión a servicios comerciales, cuentas reales, telemetría ni almacenamiento del navegador.
+- Los cobros y entregas solo modifican el ejemplo en memoria; no mueven dinero, generan documentos válidos ni afectan inventarios reales.
+- Sin impresión física, exportación, restauración, importación de archivos o cambios de permisos reales.
+- Los importes, usuarios, equipos y referencias son sintéticos. Los identificadores incluyen DEMO- y los correos de muestra usan el dominio reservado .example.
+- La calculadora utiliza aritmética pública ilustrativa. No reproduce el motor de costos del producto.
+- La demo no acredita seguridad, rendimiento, instalación, recuperación de respaldos ni funcionamiento multiusuario. Esas capacidades necesitan una prueba privada del sistema instalado.
 
-Los identificadores usan el prefijo `DEMO-`, los correos de muestra usan el dominio reservado `.example` y la interfaz identifica permanentemente el entorno como ficticio.
+La navegación de escritorio se conserva dentro de una ventana desplazable en pantallas pequeñas. Esto no representa una aplicación móvil del sistema.
 
 ## Ejecución local
 
-Requiere Node.js 22.13 o posterior y pnpm 11.
+Requiere Node.js 22.13 o posterior y pnpm 11. El repositorio fija la versión del gestor en package.json.
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm dev
+corepack pnpm install --frozen-lockfile
+corepack pnpm dev --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-Para verificar la compilación y las barreras de publicación:
+Abrir http://127.0.0.1:5173/. Si pnpm está instalado directamente, se puede omitir corepack.
+
+## Verificación
 
 ```bash
-pnpm check:public
-pnpm test
+corepack pnpm test
+corepack pnpm check:public
 ```
 
-## Controles de publicación
+La suite compila TypeScript y la aplicación, comprueba el contenido compilado, verifica los límites de publicación y prueba los estados del pedido y la calculadora. Los escenarios de negocio de estas pruebas pertenecen exclusivamente a la demo.
 
-`check:public` revisa el conjunto de archivos que Git podría publicar y falla si encuentra extensiones del producto, artefactos de base de datos, respaldos, binarios, rutas internas, llamadas de red, persistencia del navegador o dependencias operativas prohibidas.
+check:public revisa los archivos publicables y detecta artefactos comerciales, respaldos, binarios, rutas privadas, llamadas de red, persistencia y dependencias operativas prohibidas. La política de contenido mantiene connect-src 'none'; los cambios locales pueden requerir recargar la página porque la conexión de actualización automática de desarrollo está bloqueada.
 
-La revisión automatizada complementa, pero no sustituye, la revisión humana antes de cada publicación.
+## Portafolio y propiedad intelectual
 
-## Portafolio
-
-El caso de estudio forma parte del [portafolio de Eliezer Ponce](https://eliezer47.github.io/portfolio/#/project). El showcase se mantiene como repositorio separado para no mezclar su historial con el producto comercial.
-
-## Propiedad intelectual
-
-Este repositorio es visible públicamente para fines de presentación, pero no es software de código abierto. Consulta [COPYRIGHT.md](COPYRIGHT.md).
+El caso de estudio forma parte del [portafolio de Eliezer Ponce](https://eliezer47.github.io/portfolio/#/project). Este repositorio es visible para presentación, pero no es software de código abierto. Consulta [COPYRIGHT.md](COPYRIGHT.md).
 
 Contacto comercial: [eliezerponcexd@gmail.com](mailto:eliezerponcexd@gmail.com)

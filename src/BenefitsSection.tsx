@@ -7,17 +7,17 @@ type Benefit = {
 const benefits: readonly Benefit[] = [
   {
     title: "Todo el flujo conserva su contexto",
-    description: "Ventas, caja, producción, compras e inventario comparten la misma estructura visual y mantienen visible la información necesaria para continuar el trabajo.",
+    description: "Del presupuesto a la entrega, cada área conserva el pedido, sus importes y lo pendiente. El modo Simple concentra el trabajo de una persona; Por áreas separa las confirmaciones.",
     result: "Menos saltos entre registros y áreas.",
   },
   {
     title: "Impresión lista para cada estación",
-    description: "Los documentos Carta/A4 y los bauchers térmicos pueden salir por impresoras distintas, con prueba directa, vista previa y formatos de 58 u 80 mm.",
+    description: "Documentos Carta/A4, bauchers de 58 u 80 mm y etiquetas usan perfiles de la estación. Las vistas previas permiten revisar su presentación antes de imprimir.",
     result: "Cada comprobante llega en el formato correcto.",
   },
   {
     title: "Control sin perder continuidad",
-    description: "Usuarios, permisos, jornadas de caja, equipos conectados y respaldos ayudan a reconocer responsabilidades y el estado de la operación.",
+    description: "Cajas físicas, permisos por área, auditoría y alertas permiten reconocer responsabilidades. Los respaldos incluyen verificación y segunda copia; la pérdida de conexión pausa el trabajo.",
     result: "Más claridad para supervisar el día a día.",
   },
 ];
@@ -41,7 +41,7 @@ export default function BenefitsSection() {
         ))}
       </div>
 
-      <p className="benefits-disclaimer">Alcance visual con datos ficticios; las funciones operativas no forman parte de este repositorio público.</p>
+      <p className="benefits-disclaimer">Las simulaciones usan datos ficticios. Los servicios operativos, la impresión física y las verificaciones de seguridad pertenecen al producto instalado.</p>
     </section>
   );
 }

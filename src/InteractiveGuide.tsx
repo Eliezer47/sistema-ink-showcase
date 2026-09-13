@@ -4,6 +4,8 @@ import { useEffect, useLayoutEffect, useMemo, useState, type CSSProperties, type
 
 export type GuideModuleId =
   | "panel"
+  | "disponibilidad"
+  | "calculadora"
   | "metricas"
   | "ventas"
   | "caja"
@@ -44,14 +46,16 @@ type GuideStep = {
 type TargetBox = { left: number; top: number; width: number; height: number; dock: "left" | "right" };
 
 const moduleGuide: Record<GuideModuleId, { label: string; purpose: string; secondary?: boolean }> = {
+  disponibilidad: { label: "Disponibilidad", purpose: "Compara existencia física, reserva y cantidad libre por variante y almacén." },
+  calculadora: { label: "Calculadora de costos", purpose: "Prueba cantidades, margen o precio con tarifas de ejemplo sin crear documentos.", secondary: true },
   panel: { label: "Panel principal", purpose: "El flujo diario reúne prioridades, entregas, saldos y alertas." },
   metricas: { label: "Métricas", purpose: "El resumen ejecutivo conecta ventas, cobros, gastos y saldos sin revelar reglas internas." },
   ventas: { label: "Ventas", purpose: "La lista conserva juntos el pedido, su entrega, el estado y el total." },
   caja: { label: "Caja", purpose: "El panel de detalle explica el saldo antes de registrar un abono." },
   produccion: { label: "Producción", purpose: "La ficha lateral reúne proceso, cantidad, tiempo y materiales." },
-  clientes: { label: "Clientes", purpose: "La ficha reúne el contacto y sus condiciones comerciales.", secondary: true },
+  clientes: { label: "Clientes", purpose: "La ficha reúne el contacto, destinos y condiciones comerciales." },
   cotizaciones: { label: "Cotizaciones", purpose: "La vista organiza propuestas, vigencias, versiones y estados.", secondary: true },
-  entregas: { label: "Control de entregas", purpose: "La vista distingue lo entregado, lo parcial y lo pendiente.", secondary: true },
+  entregas: { label: "Entregas", purpose: "La vista distingue lo entregado, lo parcial y lo pendiente. Despachos agrupa la logística sin duplicar la salida física." },
   articulos: { label: "Artículos del cliente", purpose: "La sección sigue artículos recibidos, utilizados y devueltos.", secondary: true },
   calidad: { label: "Calidad", purpose: "La pantalla hace visibles incidencias, revisiones y correcciones.", secondary: true },
   finanzas: { label: "Finanzas", purpose: "La tabla muestra vencimientos y saldos ilustrativos.", secondary: true },
@@ -62,6 +66,11 @@ const moduleGuide: Record<GuideModuleId, { label: string; purpose: string; secon
 };
 
 const contentSteps: Record<GuideModuleId, GuideStep[]> = {
+  disponibilidad: genericSteps("Disponibilidad libre", moduleGuide.disponibilidad.purpose),
+  calculadora: [
+    { target: "module-filter", title: "Escenario de costos", message: "Cambia cantidad, margen, costo adicional o precio manual." },
+    { target: "record-detail", title: "Resultado del escenario", message: "Calcular ejemplo muestra un desglose sintético; no modifica precios oficiales." },
+  ],
   panel: [
     { target: "module-metrics", title: "Indicadores de la jornada", message: "Estas tarjetas resumen el trabajo pendiente, las entregas y los saldos del día." },
     { target: "flow-toolbar", title: "Filtro del flujo", message: "El área permite enfocar la operación por proceso sin abandonar el panel." },
@@ -73,7 +82,7 @@ const contentSteps: Record<GuideModuleId, GuideStep[]> = {
     { target: "record-detail", title: "Líderes comerciales", message: moduleGuide.metricas.purpose },
   ],
   ventas: [
-    { target: "workspace-tabs", title: "Dos vistas comerciales", message: "Aquí se alterna entre Ventas y pedidos y Documentos emitidos." },
+    { target: "workspace-tabs", title: "Vistas comerciales", message: "En Explorar pantallas puedes cambiar entre pedidos y documentos; en el recorrido sigues un pedido compartido." },
     { target: "module-filter", title: "Búsqueda y estado", message: "Los filtros acotan la lista sin modificar información real." },
     { target: "record-list", title: "Pedidos visibles", message: moduleGuide.ventas.purpose },
   ],

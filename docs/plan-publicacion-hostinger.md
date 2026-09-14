@@ -168,6 +168,10 @@ Criterio de cierre: un visitante puede entrar desde WordPress, recorrer el pedid
 
 Pendiente para cerrar: actualizar y comprobar el enlace en WordPress. La verificación de sesión por correo permitió reconocer al administrador en la página pública, pero `/wp-admin/` exige además autenticación HTTP Basic con el ámbito «Ink administration» y devuelve 401. Se solicitó al usuario completar ese acceso; no se desactivó la protección ni se cambiaron credenciales. El editor y los enlaces de WordPress aún no se han modificado.
 
+### Actualización publicada — Revisión de fidelidad 1.10.3
+
+El 13/09/2026 se publicó la entrega `057815b25c4c`, generada desde el commit `978034c16f7777a0f091a4d106342b781ba46ed2` de `main`, con 30 pruebas aprobadas y sin cambios locales pendientes. Se verificaron los archivos por SHA-256, HTTPS y el recorrido público de venta, cobro, recibos, producción y entrega parcial. El [registro de la versión publicada](version-publicable.md) identifica el inventario actual y cómo recuperar la entrega anterior. La actualización del enlace de WordPress sigue pendiente y no forma parte de esta carga de archivos.
+
 ## Fase 6 — Cerrar la entrega y definir actualizaciones
 
 Registrar la URL definitiva, el commit publicado y los pasos de actualización y recuperación. Mantener una copia de la última compilación funcional para poder restaurarla si una publicación falla.

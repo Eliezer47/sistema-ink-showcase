@@ -1,6 +1,32 @@
-# Versión publicable de la demo — Fase 3
+# Versión publicada de la demo
 
-Verificación local completada el **13/09/2026**. La entrega inicial **cc77d5640b79** se conserva como evidencia de la fase 3. La fase 5 publicó la entrega **3722b39cd28e** en [demo.inkmultiservicios.com](https://demo.inkmultiservicios.com/), incorporando el regreso a WordPress y la configuración del servidor. Falta actualizar el acceso desde WordPress; consulta el [plan de publicación](plan-publicacion-hostinger.md).
+La entrega actual **057815b25c4c** está publicada en [demo.inkmultiservicios.com](https://demo.inkmultiservicios.com/), verificada el **13/09/2026** (hora de México). Incorpora la revisión de fidelidad respecto de InkGestión **1.10.3**. Falta actualizar el acceso desde WordPress; consulta el [plan de publicación](plan-publicacion-hostinger.md).
+
+## Entrega actual — Revisión de fidelidad 1.10.3
+
+Fuente: commit [`978034c16f7777a0f091a4d106342b781ba46ed2`](https://github.com/Eliezer47/sistema-ink-showcase/commit/978034c16f7777a0f091a4d106342b781ba46ed2), sincronizado en `main`. La entrega se generó desde el árbol limpio, sin cambios locales pendientes. Los commits posteriores que solo actualicen este registro no cambian su compilación.
+
+Directorio local: `outputs/hostinger/ink-demo-057815b25c4c-4oFvce/`. El inventario `manifest.json` conserva el commit, los tamaños y SHA-256 fuera de `site/`.
+
+| Archivo dentro de `site/` | Bytes |
+| --- | ---: |
+| `.htaccess` | 763 |
+| `index.html` | 974 |
+| `assets/index-06fIzb8f.js` | 342241 |
+| `assets/index-RlAj6Ip1.css` | 95583 |
+| `og.png` | 1496117 |
+| `sistema-ink-icon.png` | 8491 |
+| **Total: 6 archivos** | **1944169** |
+
+La compilación TypeScript/Vite y las **30 pruebas** pasaron antes de preparar la entrega. El control [Public safety en GitHub Actions](https://github.com/Eliezer47/sistema-ink-showcase/actions/runs/34793457055) también terminó correctamente. La revisión local del navegador cubrió los flujos de cobro, recibos, producción, entrega, calculadora y presentación móvil; los límites de fidelidad se documentan en el informe del proyecto.
+
+Se cargaron primero los dos recursos nuevos en `public_html/assets` y se comprobaron sus hashes públicos antes de reemplazar `index.html`. Las imágenes y `.htaccess` ya coincidían con la entrega y se conservaron. La verificación pública confirmó los cinco recursos de la aplicación por SHA-256, HTTPS, redirección desde HTTP, tipos MIME, caché y bloqueo de fuentes, configuración y listado de carpetas. Evidencia local: `work/hostinger/revision-1.10.3-publicacion.json`.
+
+En el dominio público se comprobó la aprobación de la cotización, la confirmación separada de la venta y el abono de C$600. La transferencia pendiente de C$2400 conservó el saldo hasta verificarla. Una vez liquidado el pedido, el primer recibo mantuvo su importe de C$600 y su saldo al emitir de C$2400. Se inició y finalizó la producción, se entregaron cinco unidades y el inventario mostró 31 físicas, 7 reservadas y 24 disponibles. La consola capturada no mostró errores ni avisos. La página de Sistemas de WordPress continuó respondiendo con HTTP 200.
+
+Para recuperar la publicación anterior, se conserva `outputs/hostinger/ink-demo-3722b39cd28e-ABezVn/site/index.html` y sus dos recursos con hash siguen presentes en Hostinger. Restaurar ese `index.html` en el mismo sitio y verificarlo contra su inventario devuelve la versión anterior. No se eliminaron recursos antiguos durante esta actualización.
+
+Los apartados siguientes conservan la evidencia histórica de las primeras fases.
 
 ## Entrega publicada — Fase 5
 

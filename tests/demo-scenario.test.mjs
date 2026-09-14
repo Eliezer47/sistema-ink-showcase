@@ -58,12 +58,12 @@ test("pending transfers do not reduce receivables or prepare the order until ver
   assert.equal(summary(state).balance, 3000);
   assert.equal(state.production, "pending");
   assert.equal(reduce(state, { type: "pay", amount: 1, method: "cash" }), state);
-  state = reduce(state, { type: "verify" });
+  state = reduce(state, { type: "verify", paymentId: 1 });
   assert.equal(state.paid, 3000);
   assert.equal(state.pendingTransfer, 0);
   assert.equal(state.production, "finished");
   assert.equal(state.delivered, 0);
-  assert.equal(reduce(state, { type: "verify" }), state);
+  assert.equal(reduce(state, { type: "verify", paymentId: 1 }), state);
 });
 
 test("immediate transfer policy applies payment; changing policy never credits an existing pending transfer", () => {
@@ -73,7 +73,7 @@ test("immediate transfer policy applies payment; changing policy never credits a
   assert.equal(state.pendingTransfer, 600);
   state = reduce(state, { type: "pay", amount: 2400, method: "transfer" });
   assert.equal(state.paid, 2400);
-  state = reduce(state, { type: "verify" });
+  state = reduce(state, { type: "verify", paymentId: 1 });
   assert.equal(state.paid, DEMO_ORDER.total);
 });
 
@@ -85,7 +85,8 @@ test("invalid and excessive payments are rejected without mutating the example",
   assert.equal(cents.pendingTransfer, 0.3);
   cents = reduce(cents, { type: "pay", amount: 2999.69, method: "cash" });
   cents = reduce(cents, { type: "pay", amount: 0.01, method: "cash" });
-  cents = reduce(cents, { type: "verify" });
+  cents = reduce(cents, { type: "verify", paymentId: 1 });
+  cents = reduce(cents, { type: "verify", paymentId: 2 });
   assert.equal(cents.paid, 3000);
   assert.equal(summary(cents).balance, 0);
 });
@@ -133,4 +134,70 @@ test("illustrative calculator distinguishes margin on revenue from markup and ho
   assert.equal(manual.profit, 1200);
   assert.equal(manual.margin, 40);
   for (const args of [[0, 0, 30], [1.5, 0, 30], [10001, 0, 30], [1, -1, 30], [1, 0, 100], [1, 0, NaN], [1, 0, 30, 0]]) assert.equal(calculateDemoCost(...args), null);
+});
+
+test("suggested price rounds up to a whole unit while a manual price keeps its cents", () => {
+  const suggested = calculateDemoCost(1, 0, 30);
+  assert.equal(suggested.suggested, 279);
+  assert.equal(suggested.revenue, 279);
+  const manual = calculateDemoCost(1, 0, 30, 275.50);
+  assert.equal(manual.suggested, 279);
+  assert.equal(manual.unitPrice, 275.50);
+});
+
+test("each applied payment keeps its own receipt after further payments and delivery", () => {
+  let state = reduce(ordered(), { type: "pay", amount: 600, method: "cash", received: 1000 });
+  const firstReceipt = state.payments[0].receipt;
+  assert.deepEqual([firstReceipt.amount, firstReceipt.received, firstReceipt.change, firstReceipt.paid, firstReceipt.balance], [600, 1000, 400, 600, 2400]);
+  state = reduce(state, { type: "pay", amount: 2400, method: "transfer" });
+  assert.equal(state.payments[1].receipt, undefined);
+  state = reduce(state, { type: "verify", paymentId: 2 });
+  state = reduce(state, { type: "deliver", quantity: 12, productionConfirmed: true });
+  assert.equal(state.payments[0].receipt, firstReceipt);
+  assert.deepEqual([state.payments[1].receipt.amount, state.payments[1].receipt.paid, state.payments[1].receipt.balance], [2400, 3000, 0]);
+  assert.notEqual(firstReceipt.reference, state.payments[1].receipt.reference);
+});
+
+test("verifying or rejecting a transfer affects only the chosen movement", () => {
+  let state = reduce(ordered(), { type: "pay", amount: 600, method: "transfer" });
+  state = reduce(state, { type: "pay", amount: 900, method: "transfer" });
+  assert.equal(reduce(state, { type: "verify", paymentId: 999 }), state);
+  assert.equal(reduce(state, { type: "reject", paymentId: 1, reason: " " }), state);
+  state = reduce(state, { type: "verify", paymentId: 2 });
+  assert.equal(state.paid, 900);
+  assert.equal(state.pendingTransfer, 600);
+  state = reduce(state, { type: "reject", paymentId: 1, reason: "Transferencia no recibida" });
+  assert.equal(state.paid, 900);
+  assert.equal(state.pendingTransfer, 0);
+  assert.equal(state.payments[0].status, "rejected");
+  assert.equal(state.payments[0].receipt, undefined);
+  assert.equal(reduce(state, { type: "verify", paymentId: 1 }), state);
+  assert.equal(reduce(state, { type: "verify", paymentId: 2 }), state);
+  assert.equal(reduce(state, { type: "reject", paymentId: 2, reason: "No recibida" }), state);
+  state = reduce(state, { type: "pay", amount: 2100, method: "cash" });
+  assert.equal(summary(state).balance, 0);
+});
+
+test("cash receipt rejects invalid received amounts and reset clears movement history", () => {
+  const state = ordered();
+  for (const received of [NaN, Infinity, -1, 599.99]) {
+    assert.equal(reduce(state, { type: "pay", amount: 600, method: "cash", received }), state);
+  }
+  const paid = reduce(state, { type: "pay", amount: 600, method: "cash", received: 600 });
+  assert.deepEqual(reduce(paid, { type: "reset" }).payments, []);
+});
+
+test("first delivery can finish the whole prepared line explicitly without requiring payment", () => {
+  for (const mode of ["simple", "areas"]) {
+    let state = ordered(mode, false);
+    assert.equal(reduce(state, { type: "deliver", quantity: 5 }), state);
+    state = reduce(state, { type: "deliver", quantity: 5, productionConfirmed: true });
+    assert.equal(state.production, "finished");
+    assert.equal(state.delivered, 5);
+    assert.equal(state.paid, 0);
+    assert.equal(summary(state).balance, 3000);
+    state = reduce(state, { type: "deliver", quantity: 7 });
+    assert.equal(state.delivered, 12);
+    assert.equal(summary(state).complete, false);
+  }
 });

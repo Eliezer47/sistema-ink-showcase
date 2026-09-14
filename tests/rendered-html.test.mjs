@@ -56,7 +56,7 @@ test("build contains the isolated InkGestión visual showcase", async () => {
   assert.match(javascript, /Compras abiertas/i);
   assert.match(javascript, /Valor por recibir/i);
   assert.match(javascript, /Inspeccionar y recibir/i);
-  assert.match(javascript, /Datos ficticios · Operaciones simuladas/i);
+  assert.match(javascript, /Demo del sistema de escritorio · Datos ficticios/i);
   assert.match(javascript, /Más vistas del sistema/i);
   assert.match(javascript, /Acerca de esta demo/i);
   assert.match(javascript, /Iniciar sesión/i);

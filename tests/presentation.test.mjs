@@ -20,7 +20,9 @@ test("initial presentation shows the system and keeps supplementary content clos
     for (const text of ["Explorar pantallas", "Seguir un pedido", "Modo de operación", "Más vistas", "Acerca de esta demo", "Panel principal", "Guía", "DEMO-1048"]) {
       assert.ok(html.includes(text), `Missing first-visit control or system content: ${text}`);
     }
-    assert.equal(html.match(/Datos ficticios · Operaciones simuladas/g)?.length, 1);
+    assert.equal(html.match(/Demo del sistema de escritorio · Datos ficticios/g)?.length, 1);
+    assert.ok(html.includes("Funciones según edición y permisos"));
+    assert.ok(html.includes("Pantallas de referencia · Registros de muestra"));
     assert.doesNotMatch(html, /class="(?:hero|trust-section|benefits-section|feature-carousel)"/);
     assert.doesNotMatch(html, /<dialog\b|role="tabpanel"/);
     assert.doesNotMatch(html, /La operación completa,|Una herramienta pensada alrededor/);

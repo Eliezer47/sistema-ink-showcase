@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import type { DemoReceipt } from "./demoScenario";
 
 export default function DemoDialog({ title, onClose, children, wide = false, closeLabel = "Cerrar vista previa", footer = "Vista de ejemplo · Datos ficticios · Sin impresión ni envío" }: {
   title: string; onClose: () => void; children: ReactNode; wide?: boolean; closeLabel?: string; footer?: string;
@@ -22,15 +23,20 @@ export default function DemoDialog({ title, onClose, children, wide = false, clo
   </dialog>;
 }
 
-export function DocumentExample({ kind = "receipt", paid = 600, total = 3000, labelKind = "shipping" }: { kind?: "receipt" | "label" | "quote" | "card"; paid?: number; total?: number; labelKind?: "shipping" | "pickup" }) {
+export function DocumentExample({ kind = "receipt", paid = 600, total = 3000, labelKind = "shipping", receipt }: { kind?: "receipt" | "label" | "quote" | "card"; paid?: number; total?: number; labelKind?: "shipping" | "pickup"; receipt?: DemoReceipt }) {
   const money = (value: number) => `C$ ${value.toFixed(2)}`;
+  const paidAtIssue = receipt?.paid ?? paid;
   return <article className={`demo-document document-${kind}`}>
     <img src="./sistema-ink-icon.png" alt="" /><h3>Atelier Demo</h3>
-    <p>{kind === "label" ? labelKind === "shipping" ? "ETIQUETA DE ENVÍO" : "ETIQUETA DE RETIRO LOCAL" : kind === "quote" ? "COTIZACIÓN" : kind === "card" ? "RESUMEN DEL PEDIDO" : "RECIBO DE ABONO"}</p>
-    <strong>{kind === "quote" ? "COT-DEMO-0201" : kind === "receipt" ? "REC-DEMO-0201" : "PED-DEMO-0201"}</strong>
+    <p>{kind === "label" ? labelKind === "shipping" ? "ETIQUETA DE ENVÍO" : "ETIQUETA DE RETIRO LOCAL" : kind === "quote" ? "COTIZACIÓN" : kind === "card" ? "RESUMEN DEL PEDIDO" : paidAtIssue < total ? "RECIBO DE ABONO" : "RECIBO DE PAGO"}</p>
+    <strong>{kind === "quote" ? "COT-DEMO-0201" : kind === "receipt" ? receipt?.reference ?? "REC-DEMO-0201" : "PED-DEMO-0201"}</strong>
     <p>Café Lumbre · 11/09/2026</p>
     {kind === "label" ? <><hr /><h4>{labelKind === "shipping" ? "DESTINATARIO" : "RETIRA"}</h4><strong>Café Lumbre</strong>{labelKind === "shipping" && <p>Distrito Creativo · Dirección ficticia</p>}<p>{labelKind === "shipping" ? "Entrega local" : "Retiro en mostrador"} · 1 bulto · 12 camisetas</p><div className="demo-barcode" aria-label="Código ilustrativo no escaneable" /><small>Referencia visual · No escaneable</small></> : <>
-      <hr /><p>12 × Camiseta blanca con estampado frontal</p><dl><div><dt>Total</dt><dd>{money(total)}</dd></div>{kind !== "quote" && <><div><dt>Pagado</dt><dd>{money(paid)}</dd></div><div><dt>Saldo</dt><dd>{money(total - paid)}</dd></div></>}</dl>
+      <hr /><p>12 × Camiseta blanca con estampado frontal</p><dl><div><dt>Total</dt><dd>{money(total)}</dd></div>{kind !== "quote" && <>
+        {kind === "receipt" && <div><dt>Importe de este cobro</dt><dd>{money(receipt?.amount ?? paid)}</dd></div>}
+        {receipt && <><div><dt>Método</dt><dd>{receipt.method === "cash" ? "Efectivo" : "Transferencia"}</dd></div>{receipt.method === "cash" && <><div><dt>Recibido</dt><dd>{money(receipt.received)}</dd></div><div><dt>Vuelto</dt><dd>{money(receipt.change)}</dd></div></>}</>}
+        <div><dt>{kind === "receipt" ? "Pagado al emitir" : "Pagado"}</dt><dd>{money(paidAtIssue)}</dd></div><div><dt>{kind === "receipt" ? "Saldo al emitir" : "Saldo"}</dt><dd>{money(receipt?.balance ?? total - paidAtIssue)}</dd></div>
+      </>}</dl>
       <hr /><p>{kind === "quote" ? "Válida hasta 18/09/2026 · Entrega acordada 15/09/2026" : "Gracias por tu preferencia"}</p>
     </>}
     <small>{kind === "card" ? "Resumen comercial; no sustituye el comprobante formal." : "No válido como comprobante fiscal"}<br />DATOS FICTICIOS · DEMO</small>

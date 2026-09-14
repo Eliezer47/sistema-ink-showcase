@@ -384,7 +384,7 @@ export default function DemoWorkspace({ expanded, expandButtonRef, onToggleExpan
       <h2 id="demo-title" className="sr-only">Explorar InkGestión</h2>
 
       <div className="demo-experience-toolbar">
-        {expanded && <p className="demo-expanded-notice"><strong>InkGestión · Demo</strong> Datos ficticios · Operaciones simuladas</p>}
+        {expanded && <p className="demo-expanded-notice"><strong>InkGestión</strong> Demo del sistema de escritorio · Datos ficticios</p>}
         <div role="group" aria-label="Experiencia de demostración"><button type="button" aria-pressed={!followingScenario} onClick={() => setFollowingScenario(false)}>Explorar pantallas</button><button type="button" aria-pressed={followingScenario} onClick={() => { setFollowingScenario(true); if (!scenarioModules.has(active)) navigate("panel"); }}>Seguir un pedido</button></div>
         <DemoControls compact />
         <div className="demo-workspace-actions">
@@ -393,6 +393,7 @@ export default function DemoWorkspace({ expanded, expandButtonRef, onToggleExpan
           <button ref={expandButtonRef} type="button" aria-pressed={expanded} onClick={onToggleExpanded}>{expanded ? "Salir de vista ampliada" : "Ampliar vista"}</button>
           {followingScenario && <button type="button" aria-label="Reiniciar ejemplo" onClick={() => { dispatch({ type: "reset" }); navigate("panel"); setGuideOpen(false); }}>Reiniciar</button>}
         </div>
+        <p className="demo-experience-notice">{followingScenario ? (scenarioModules.has(active) ? "Recorrido guiado · Pasos abreviados de un pedido" : "Pantalla de referencia · Sus registros no cambian con el pedido") : "Pantallas de referencia · Registros de muestra"}<span>Funciones según edición y permisos</span></p>
       </div>
       <div className="demo-viewport-navigation" hidden={!pan.overflow}>
         <label>Pantalla<select aria-label="Ir a pantalla" value={active} onChange={(event) => {

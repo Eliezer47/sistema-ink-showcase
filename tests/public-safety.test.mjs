@@ -279,7 +279,7 @@ test("provides manual supplementary tabs without product connectivity", () => {
 test("keeps the demo scope available on demand without a marketing landing page", () => {
   const app = readFileSync("src/App.tsx", "utf8");
   for (const notice of [
-    "Datos ficticios · Operaciones simuladas", "Acerca de esta demo",
+    "Demo del sistema de escritorio · Datos ficticios", "Acerca de esta demo",
     "Referencia del sistema · 1.10.3", "Sin conexión al producto comercial",
     "Impresión física, permisos, respaldos y trabajo multiusuario",
     "demostración del sistema instalado",

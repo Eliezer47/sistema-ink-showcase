@@ -1,5 +1,18 @@
 // This example models only the public demonstration, never commercial operations.
 export type OperationMode = "areas" | "simple";
+export type DemoReceipt = Readonly<{
+  reference: string;
+  amount: number;
+  method: "cash" | "transfer";
+  received: number;
+  change: number;
+  paid: number;
+  balance: number;
+}>;
+export type DemoPayment = { id: number; amount: number; method: "cash" | "transfer" } & (
+  | { status: "pending" | "rejected"; receipt?: never; reason?: string }
+  | { status: "applied"; receipt: DemoReceipt }
+);
 export type DemoScenario = {
   mode: OperationMode;
   autoPrepare: boolean;
@@ -7,6 +20,7 @@ export type DemoScenario = {
   quote: "draft" | "approved" | "converted";
   paid: number;
   pendingTransfer: number;
+  payments: DemoPayment[];
   production: "pending" | "active" | "finished";
   delivered: number;
   events: string[];
@@ -23,24 +37,35 @@ export type DemoAction =
   | { type: "mode"; mode: OperationMode }
   | { type: "autoPrepare"; enabled: boolean }
   | { type: "transferPolicy"; policy: DemoScenario["transferPolicy"] }
-  | { type: "approve" | "convert" | "verify" | "start" | "finish" }
-  | { type: "pay"; amount: number; method: "cash" | "transfer" }
-  | { type: "deliver"; quantity: number };
+  | { type: "approve" | "convert" | "start" | "finish" }
+  | { type: "pay"; amount: number; method: "cash" | "transfer"; received?: number }
+  | { type: "verify"; paymentId: number }
+  | { type: "reject"; paymentId: number; reason: string }
+  | { type: "deliver"; quantity: number; productionConfirmed?: boolean };
 
 export function createDemoScenario(): DemoScenario {
   return { mode: "areas", autoPrepare: true, transferPolicy: "verify", quote: "draft", paid: 0,
-    pendingTransfer: 0, production: "pending", delivered: 0, events: ["Cotización de ejemplo preparada"] };
+    pendingTransfer: 0, payments: [], production: "pending", delivered: 0, events: ["Cotización de ejemplo preparada"] };
 }
 
 function record(state: DemoScenario, changes: Partial<DemoScenario>, event: string): DemoScenario {
   return { ...state, ...changes, events: [...state.events, event] };
 }
 
-function credited(state: DemoScenario, amount: number, event: string): DemoScenario {
-  const paid = Math.round((state.paid + amount) * 100) / 100;
+function credited(state: DemoScenario, payment: DemoPayment, received: number, event: string): DemoScenario {
+  const paid = Math.round((state.paid + payment.amount) * 100) / 100;
   const production = state.mode === "simple" && state.autoPrepare && paid === DEMO_ORDER.total
     ? "finished" : state.production;
-  return record(state, { paid, production }, event);
+  // A receipt belongs to this fictional movement; later payments never rewrite it.
+  const applied: DemoPayment = { ...payment, status: "applied", receipt: {
+    reference: `REC-DEMO-${String(payment.id).padStart(4, "0")}`, amount: payment.amount,
+    method: payment.method, received, change: Math.round((received - payment.amount) * 100) / 100,
+    paid, balance: Math.round((DEMO_ORDER.total - paid) * 100) / 100,
+  } };
+  const payments = state.payments.some((item) => item.id === payment.id)
+    ? state.payments.map((item) => item.id === payment.id ? applied : item)
+    : [...state.payments, applied];
+  return record(state, { paid, production, payments }, event);
 }
 
 export function demoScenarioReducer(state: DemoScenario, action: DemoAction): DemoScenario {
@@ -56,18 +81,28 @@ export function demoScenarioReducer(state: DemoScenario, action: DemoAction): De
     const amount = Math.round(action.amount * 100) / 100;
     const availableToPay = Math.round((DEMO_ORDER.total - state.paid - state.pendingTransfer) * 100) / 100;
     if (!Number.isFinite(amount) || amount <= 0 || amount > availableToPay) return state;
+    const received = action.method === "cash" ? Math.round((action.received ?? amount) * 100) / 100 : amount;
+    if (!Number.isFinite(received) || received < amount) return state;
+    const payment: DemoPayment = { id: state.payments.length + 1, amount, method: action.method, status: "pending" };
     if (action.method === "transfer" && state.transferPolicy === "verify") {
-      return record(state, { pendingTransfer: Math.round((state.pendingTransfer + amount) * 100) / 100 }, "Transferencia pendiente de verificar; todavía no reduce el saldo");
+      return record(state, { pendingTransfer: Math.round((state.pendingTransfer + amount) * 100) / 100, payments: [...state.payments, payment] }, "Transferencia pendiente de verificar; todavía no reduce el saldo");
     }
-    return credited(state, amount, action.method === "cash" ? "Cobro en efectivo aplicado" : "Transferencia aplicada inmediatamente");
+    return credited(state, payment, received, action.method === "cash" ? "Cobro en efectivo aplicado" : "Transferencia aplicada inmediatamente");
   }
-  if (action.type === "verify") return state.pendingTransfer > 0
-    ? credited({ ...state, pendingTransfer: 0 }, state.pendingTransfer, "Transferencia verificada y aplicada") : state;
+  if (action.type === "verify" || action.type === "reject") {
+    const payment = state.payments.find((item) => item.id === action.paymentId);
+    if (!payment || payment.status !== "pending") return state;
+    const pendingTransfer = Math.round((state.pendingTransfer - payment.amount) * 100) / 100;
+    if (action.type === "verify") return credited({ ...state, pendingTransfer }, payment, payment.amount, "Transferencia verificada y aplicada");
+    const reason = action.reason.trim();
+    if (!reason) return state;
+    return record(state, { pendingTransfer, payments: state.payments.map((item) => item.id === payment.id ? { ...payment, status: "rejected", reason } : item) }, "Transferencia rechazada; el saldo sigue pendiente y puede cobrarse de nuevo");
+  }
   if (action.type === "start") return state.production === "pending" ? record(state, { production: "active" }, "Trabajo iniciado en Producción") : state;
   if (action.type === "finish") return state.production === "active" ? record(state, { production: "finished" }, "Producción finalizada; entrega física pendiente") : state;
   if (action.type === "deliver") {
-    if (state.production !== "finished" || !Number.isInteger(action.quantity) || action.quantity <= 0 || action.quantity > DEMO_ORDER.quantity - state.delivered) return state;
-    return record(state, { delivered: state.delivered + action.quantity }, `Entrega de ${action.quantity} unidades registrada; salida física de inventario`);
+    if ((state.production !== "finished" && !action.productionConfirmed) || !Number.isInteger(action.quantity) || action.quantity <= 0 || action.quantity > DEMO_ORDER.quantity - state.delivered) return state;
+    return record(state, { production: "finished", delivered: state.delivered + action.quantity }, `${state.production !== "finished" ? "Preparación de las 12 unidades confirmada. " : ""}Entrega de ${action.quantity} unidades registrada; salida física de inventario`);
   }
   return state;
 }
@@ -95,7 +130,7 @@ export function calculateDemoCost(quantity: number, additional: number, margin: 
   const overhead = 60;
   const totalCost = materials + labor + machine + overhead + additional;
   const unitCost = totalCost / quantity;
-  const suggested = unitCost / (1 - margin / 100);
+  const suggested = Math.ceil(unitCost / (1 - margin / 100));
   const unitPrice = manualPrice ?? suggested;
   const revenue = unitPrice * quantity;
   return { materials, labor, machine, overhead, totalCost, unitCost, suggested, unitPrice,

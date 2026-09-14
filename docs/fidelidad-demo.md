@@ -2,6 +2,8 @@
 
 Fecha de revisión: 12 de septiembre de 2026. Referencia del producto: **1.10.3**, entrega del 11 de septiembre de 2026, revisión **d1c852b**. Base de la demo revisada: **84db573**.
 
+Revisión adicional: **13 de septiembre de 2026**, sobre la demo **72d1c34**. Se verificó en lectura que `main` remoto del producto apunta a **d1c852b449a21c2b7fdcf685f0cda0380844a4a8**. Se usó esa revisión confirmada; los cambios locales posteriores del producto quedaron fuera de la comparación.
+
 ## Conclusión
 
 La demo original servía para presentar la apariencia general, pero no permitía apreciar con suficiente fidelidad el alcance actual del sistema. Mostraba 15 módulos, cuatro reutilizaban una tabla genérica y faltaban funciones relevantes de navegación, operación, catálogo y administración. La frase comercial sobre un flujo integrado no podía comprobarse al recorrerla.
@@ -58,22 +60,55 @@ Panel, Métricas y Compras conservan presentaciones ilustrativas con acciones op
 | Costos, compras y conciliación | Campos y ejemplos de resultados | Ejecutar recepción parcial, consumos, distribución de costos y conciliación con datos controlados. |
 | Rendimiento e instalación | Aplicación web compilada localmente | Instalar la entrega, comprobar sus prerrequisitos y medir con carga representativa. |
 
-Los recibos de la simulación son resúmenes ilustrativos; el producto emite comprobantes individuales inmutables por movimiento. La calculadora no sustituye el motor comercial. Los reportes operativos no se presentan como contabilidad formal o facturación electrónica. La versión web no implica disponibilidad del sistema como servicio cloud o aplicación móvil.
+Los recibos del recorrido conservan ahora los importes de cada cobro aplicado, incluso después de otros pagos. Su formato HTML sigue siendo ilustrativo y no reproduce todas las plantillas del producto. La calculadora no sustituye el motor comercial. Los reportes operativos no se presentan como contabilidad formal o facturación electrónica. La versión web no implica disponibilidad del sistema como servicio cloud o aplicación móvil.
 
 ## Guion sugerido de demostración
 
 1. Abrir Explorar pantallas y mostrar Ventas, Finanzas, Catálogo y Administración. Usar una búsqueda y abrir un documento de ejemplo.
-2. Cambiar a Seguir un pedido en Por áreas. Aprobar la cotización por 12 camisetas de C$250 y convertirla.
+2. Cambiar a Seguir un pedido en Por áreas. Aprobar la cotización por 12 camisetas de C$250, continuar en Ventas y confirmar la venta Desde cotización.
 3. Cobrar C$600 en efectivo. Registrar los C$2,400 restantes como transferencia pendiente y mostrar que todavía existe saldo. Verificarla.
 4. Iniciar y finalizar producción. Entregar cinco unidades. Inventario debe mostrar 31 físicas, siete reservadas y 24 disponibles; Disponibilidad debe coincidir.
 5. Cambiar a Simple sin perder los datos. En Ventas, Entregar ahora confirma las siete unidades restantes.
 6. Reiniciar el ejemplo en Simple. Cobrar el total y mostrar que la preparación automática conserva la entrega pendiente hasta confirmarla. La política se puede cambiar en Administración > Empresa.
 7. Cerrar con las vistas de impresión y acordar una demostración del producto instalado para validar hardware y operación real.
 
-## Verificación de esta actualización
+## Verificación inicial del 12 de septiembre
 
 La suite automatizada incluye compilación TypeScript/Vite, barreras de publicación, contenido del paquete compilado y diez casos de comportamiento del pedido y la calculadora. Las pruebas comprueban importes inválidos, exceso de pago, precisión de centavos, verificación idempotente, independencia entre saldo y entrega, cambios de modo y reinicio.
 
 La revisión de navegador cubre búsquedas y selección, documentos y etiquetas, las siete secciones financieras, nueve de Catálogo y once de Administración, cálculo de ejemplo, recorrido con abono y transferencia, entrega parcial, disponibilidad y confirmación en Simple. Estas comprobaciones validan el showcase; no sustituyen pruebas del producto comercial.
 
 Resultado de esta revisión: **21 de 21 pruebas aprobadas**, compilación correcta y ningún error o aviso en la consola capturada del navegador. Se verificaron también cancelación de entrega, reinicio, F3 y cierre de ventanas con Escape.
+
+## Revisión adicional del 13 de septiembre
+
+### Resultado comercial
+
+La demo sirve como recorrido orientativo de las funciones y del flujo mostrado. No debe presentarse como una reproducción exacta de todas las pantallas de captura, ni como prueba de funcionamiento de una instalación real. El recorrido abrevia formularios y usa un único pedido preparado. Las funciones incluidas en la venta deben coincidir con la edición, configuración y permisos acordados con el comprador.
+
+### Diferencias verificadas y corregidas
+
+| Diferencia | Evidencia en la entrega 1.10.3 | Corrección en la demo |
+| --- | --- | --- |
+| La aclaración sobre escritorio estaba dentro de Acerca de | Manual: propósito, conexión y estaciones | Aviso visible al entrar y al ampliar; identifica datos ficticios. |
+| La vista completa podía interpretarse como incluida en cualquier compra | Manual: Edición comercial | Se indica que las funciones dependen de edición y permisos; Acerca de identifica Comercial, Operaciones e Integral. |
+| Convertir aparecía como acción directa en Cotizaciones | Manual: Cotizaciones, Convertir a pedido; controles de Cotizaciones y Ventas | Aprobar conserva la propuesta; el recorrido continúa en Ventas, Desde cotización, Confirmar venta. |
+| Caja mostraba solo dos vistas generales | Manual: Registrar un cobro; controles de Caja | Por cobrar, Pendientes, Pagados e Historial de hoy. Un pedido pagado y parcialmente entregado sigue pendiente. |
+| La verificación agrupaba todo lo pendiente y no permitía rechazar | Manual: Verificar transferencias | Verificar o rechazar cada movimiento por separado; rechazo con motivo, conservación de historia y saldo disponible para un nuevo cobro. |
+| Un mismo recibo cambiaba al aumentar el pago acumulado | Manual: reimpresión; pruebas existentes de comprobantes de la entrega | Recibo por cobro aplicado con número, importe, método y saldo al emitir. No se ofrece recibo para transferencias pendientes o rechazadas. |
+| Efectivo no mostraba el vuelto | Manual: Registrar un cobro | Monto recibido, aplicación hasta el saldo disponible y vuelto conservado en el recibo. |
+| El recorrido obligaba a pasar por Producción antes de entregar | Manual: Trabajar una tarea y Entrega parcial o total; pruebas existentes de entrega en Simple | Entrega independiente del cobro. Si producción no está finalizada, exige confirmar que toda la línea está físicamente terminada, incluso en entrega parcial. |
+| La calculadora conservaba decimales en el precio sugerido | Texto de la Calculadora de costos de 1.10.3 | Redondeo al entero superior; precio manual conserva sus centavos. Las tarifas permanecen ficticias. |
+| Se podían confundir los pasos abreviados con las pantallas completas | Comparación de controles del escritorio y formularios del recorrido | Se distingue Pantallas de referencia de Recorrido guiado. Al visitar una pantalla fuera del pedido se aclara que sus registros no cambian con él. |
+
+### Alcance y comprobación
+
+- Se consultaron documentación, definiciones de interfaz y pruebas existentes de **la revisión de entrega**. No se ejecutaron el cliente comercial, sus pruebas .NET, SQL Server, instaladores ni impresoras durante esta revisión.
+- Las nuevas pruebas reprodujeron cinco grupos de discrepancias antes del cambio y pasaron después. La suite de la demo aprobó **30 de 30 pruebas**, incluida compilación, publicación y ausencia de conexiones al producto o persistencia del navegador.
+- Se verificaron **nueve recorridos agrupados** en un navegador sin ventana y con perfil temporal: Caja, conversión, recibos, transferencias, vuelto, entrega parcial/final, entrega sin cobrar, calculadora, navegación por los 16 módulos, vista ampliada y móvil de 390 × 844.
+- Los nueve recorridos terminaron sin errores de aplicación ni solicitudes externas atribuibles a la demo. El antivirus local inyectó contenido y solicitudes propias, además de tres avisos de CSP; el HTML servido conserva su política original. Esa actividad del entorno se registró por separado, sin modificar la configuración del antivirus.
+- No se incorporaron fuentes, contratos, algoritmos privados, bases de datos ni registros reales del sistema al repositorio público. La nueva lógica pertenece solo al ejemplo ficticio.
+
+La validación visual exacta, formatos de impresión, operación multiusuario, permisos efectivos, instalación y restauración siguen pendientes de una demostración de la entrega comercial. Esta revisión no elimina esa limitación ni constituye una garantía de equivalencia completa.
+
+**Publicación:** consulta `version-publicable.md` para identificar la entrega alojada y sus verificaciones. La comparación anterior describe el código revisado; el registro de publicación permite comprobar qué versión está disponible para los prospectos.

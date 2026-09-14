@@ -15,13 +15,15 @@ Las fases 1 a 4 están completadas: presentación mínima, exploración ajustada
 ## Qué puede probar un prospecto
 
 - **Explorar pantallas:** navegar por 16 módulos y abrir la consulta de Disponibilidad mediante el menú o F3. Catálogo contiene nueve apartados; Administración, once; Finanzas, siete. Los accesos opcionales de Calculadora, Artículos del cliente y Calidad están habilitados en este perfil de demostración.
-- **Seguir un pedido:** aprobar una cotización, convertirla, registrar abonos o transferencias ficticias, verificar el cobro, preparar el trabajo y entregar total o parcialmente. Ventas, Caja, Producción, Entregas, Inventario, Disponibilidad y la cuenta por cobrar comparten el estado de ese ejemplo.
+- **Seguir un pedido:** aprobar una cotización y confirmar la venta desde ella en Ventas; registrar abonos o transferencias ficticias, verificar o rechazar cada transferencia y entregar total o parcialmente. Cada cobro aplicado conserva su propio recibo, importe, vuelto y saldo al emitir. Ventas, Caja, Producción, Entregas, Inventario, Disponibilidad y la cuenta por cobrar comparten el estado de ese ejemplo.
 - **Comparar Simple y Por áreas:** Simple oculta Producción y Entregas del menú y permite confirmar toda la entrega pendiente desde Ventas o Caja. Las políticas de preparación automática y verificación de transferencias se prueban en Administración > Empresa.
 - **Buscar y seleccionar registros** en las listas habilitadas, abrir ejemplos de cotización, recibo, resumen y etiquetas, y calcular un escenario de costos con tarifas sintéticas.
 - **Consultar la guía** contextual y abrir «Más vistas» para revisar acceso, servidor, PIN, impresión, baucher y pérdida de conexión. Las pestañas admiten flechas, Inicio y Fin; Escape cierra la ventana y devuelve el foco al botón de acceso.
 - **Ampliar la vista** con los mismos controles y datos. Guía, Más vistas y Reiniciar permanecen fuera del desplazamiento horizontal. Escape cierra primero la ventana o guía abierta; sin ellas, sale de la vista ampliada.
 
 Los botones deshabilitados representan funciones disponibles únicamente en el producto instalado. Los ejemplos de Explorar pantallas son ilustraciones; el estado compartido corresponde a Seguir un pedido. Reiniciar ejemplo restaura el pedido y conserva las políticas elegidas; recargar restaura toda la demostración.
+
+La vista completa incluye funciones sujetas a edición y permisos. El recorrido usa pasos abreviados; no reproduce todos los formularios del escritorio. La revisión adicional del 13 de septiembre está en [el informe de fidelidad](docs/fidelidad-demo.md). La entrega alojada se identifica en [el registro de publicación](docs/version-publicable.md).
 
 ## Límites
 

@@ -78,14 +78,20 @@ export function SalesExample() {
 
 export function CashExample() {
   const { state } = useDemoSession();
-  const [tab, setTab] = useState("Pendientes de cobro");
+  const [tab, setTab] = useState("Por cobrar");
+  const history = tab === "Historial de hoy";
+  const paidOrder: ExampleRecord = { id: "paid", cells: ["PED-DEMO-0199", "Estudio Prisma", "C$ 4,600.00", "C$ 0.00"], title: "Pagado · Pendiente de entrega", facts: [["Cliente", "Estudio Prisma"], ["Pagado", "C$ 4,600.00"], ["Saldo", "C$ 0.00"], ["Entregado", "12 de 20 unidades"], ["Pendiente de entregar", "8 unidades"]], note: "Sigue en Pendientes hasta completar la entrega física, aunque ya no tenga saldo por cobrar." };
   return <DemoPage title={state.mode === "simple" ? "Cobro rápido" : "Caja"} description="Cobros, transferencias pendientes y saldos de pedidos.">
     <Metrics items={[["CAJA ABIERTA", "Mostrador DEMO"], ["Fecha empresarial", "11/09/2026"], ["Efectivo esperado", "C$ 7,600.00"], ["Por verificar", "C$ 1,200.00"]]} />
-    <DemoTabs labels={["Pendientes de cobro", "Movimientos de hoy"]} active={tab} onChange={setTab} />
-    <RecordExplorer key={tab} headers={tab === "Pendientes de cobro" ? ["Pedido", "Cliente", "Total", "Saldo"] : ["Recibo", "Concepto", "Método", "Importe"]} detailTitle={tab === "Pendientes de cobro" ? "COBRO DEL PEDIDO" : "HISTORIAL DEL RECIBO"} records={tab === "Pendientes de cobro" ? [
+    <DemoTabs labels={["Por cobrar", "Pendientes", "Pagados", "Historial de hoy"]} active={tab} onChange={setTab} />
+    <RecordExplorer key={tab} headers={!history ? ["Pedido", "Cliente", "Total", "Saldo"] : ["Movimiento", "Concepto", "Método / estado", "Importe"]} detailTitle={!history ? "COBRO DEL PEDIDO" : "HISTORIAL DEL RECIBO"} records={tab === "Pagados" ? [paidOrder] : !history ? [
       { id: "cash1", cells: ["PED-DEMO-0201", "Café Lumbre", "C$ 3,000.00", "C$ 2,400.00"], title: "Café Lumbre", facts: [["Total del pedido", "C$ 3,000.00"], ["Pagado", "C$ 600.00"], ["Saldo propuesto", "C$ 2,400.00"], ["Por verificar", "C$ 0.00"]], note: "Efectivo, transferencia y saldo a favor pueden combinarse. Una transferencia pendiente no se considera dinero aplicado." },
       { id: "cash2", cells: ["PED-DEMO-0190", "Casa Nativa", "C$ 2,500.00", "C$ 1,200.00"], title: "Casa Nativa", facts: [["Total", "C$ 2,500.00"], ["Pagado", "C$ 1,300.00"], ["Saldo", "C$ 1,200.00"], ["Transferencia pendiente", "C$ 1,200.00"]] },
-    ] : [{ id: "mov", cells: ["REC-DEMO-0201", "Abono · Café Lumbre", "Efectivo", "C$ 600.00"], title: "Recibo de abono", facts: [["Pedido", "PED-DEMO-0201"], ["Importe aplicado", "C$ 600.00"], ["Fecha", "11/09/2026"], ["Caja", "Mostrador DEMO"]], note: "El comprobante conserva los importes del momento en que fue emitido." }]} actions={<><PreviewButton>Efectivo</PreviewButton><PreviewButton>Transferencia</PreviewButton><PreviewButton>Saldo a favor</PreviewButton><PreviewButton>Cobrar saldo completo</PreviewButton></>} />
+      ...(tab === "Pendientes" ? [paidOrder] : []),
+    ] : [
+      { id: "pending", cells: ["MOV-DEMO-0202", "Casa Nativa", "Transferencia · Sin verificar", "C$ 1,200.00"], title: "Transferencia pendiente", facts: [["Pedido", "PED-DEMO-0190"], ["Importe", "C$ 1,200.00"], ["Aplicado", "C$ 0.00"], ["Estado", "Sin verificar"]], note: "Las transferencias sin verificar aparecen primero. Permiten Verificar o Rechazar; todavía no permiten emitir un recibo de pago." },
+      { id: "mov", cells: ["REC-DEMO-0201", "Abono · Café Lumbre", "Efectivo · Aplicado", "C$ 600.00"], title: "Recibo de abono", facts: [["Pedido", "PED-DEMO-0201"], ["Importe aplicado", "C$ 600.00"], ["Fecha", "11/09/2026"], ["Caja", "Mostrador DEMO"]], note: "El comprobante conserva los importes del momento en que fue emitido." },
+    ]} actions={history ? <><PreviewButton>Verificar</PreviewButton><PreviewButton>Rechazar</PreviewButton><PreviewButton>Imprimir recibo</PreviewButton></> : <><PreviewButton>Efectivo</PreviewButton><PreviewButton>Transferencia</PreviewButton><PreviewButton>Saldo a favor</PreviewButton><PreviewButton>Cobrar saldo completo</PreviewButton></>} />
     <details className="faithful-disclosure"><summary>Más operaciones</summary><div className="faithful-actions">{["Retiro", "Cierre diario", "Movimiento atrasado", "Ajuste físico", "Cerrar caja 11/09"].map((label) => <PreviewButton key={label}>{label}</PreviewButton>)}</div><p>La fecha empresarial y la caja física identifican dónde queda cada movimiento.</p></details>
   </DemoPage>;
 }
@@ -149,6 +155,7 @@ export function CostCalculatorExample() {
       <label>Costo adicional del lote (NIO)<input required type="number" min="0" step="0.01" value={additional} onChange={(e) => { setAdditional(e.target.value); setResult(null); }} /></label>
       <label>Margen objetivo %<input required type="number" min="0" max="99.99" step="0.01" value={margin} onChange={(e) => { setMargin(e.target.value); setResult(null); }} /></label>
       <label>Precio manual por unidad (opcional)<input type="number" min="0.01" step="0.01" value={manual} onChange={(e) => { setManual(e.target.value); setResult(null); }} placeholder="Usar sugerido" /></label>
+      <p>El costo adicional se aplica al lote completo. El precio sugerido usa margen sobre venta y se redondea al entero superior.</p>
       <button className="real-primary-button" type="submit">Calcular ejemplo</button>{error && <p role="alert">{error}</p>}
     </form><section className="detail-pane" data-guide-target="record-detail">{result ? <><h3>Resultado del escenario</h3><Metrics items={[["Costo unitario", demoMoney(result.unitCost)], ["Precio sugerido", demoMoney(result.suggested)], ["Venta del lote", demoMoney(result.revenue)], ["Utilidad", demoMoney(result.profit)]]} /><Facts items={[["Materiales", demoMoney(result.materials)], ["Mano de obra", demoMoney(result.labor)], ["Máquina", demoMoney(result.machine)], ["Gastos indirectos", demoMoney(result.overhead)], ["Adicional", demoMoney(Number(additional))], ["Costo total", demoMoney(result.totalCost)], ["Margen sobre venta", `${result.margin.toFixed(1)} %`]]} /></> : <><h3>Prepara un escenario</h3><p>Indica cantidad, margen o precio manual y pulsa Calcular ejemplo.</p></>}
       <p className="faithful-list-note">Tarifas sintéticas: material C$ 110, mano de obra C$ 20 y máquina C$ 5 por unidad; indirectos C$ 60 por lote. Esta aritmética ilustrativa no reproduce el motor de costos comercial.</p>

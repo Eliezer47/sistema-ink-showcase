@@ -65,6 +65,13 @@ body { background: #0d171e; }
 .demo-site .internal-nav { grid-template-rows: auto minmax(0, 1fr) auto; }
 .demo-expanded-notice { flex-basis: 100%; margin: 0; color: #a7bac4; font-size: 11px; }
 .demo-expanded-notice strong { color: #e3f6f7; margin-right: 12px; }
+.demo-experience-notice { display: flex; justify-content: space-between; flex-wrap: wrap; flex-basis: 100%; gap: 4px 16px; margin: 0; color: #b4c9d3; font-size: 11px; line-height: 1.5; }
+.demo-experience-notice span { color: #a7bac4; }
+.scenario-payments { margin-top: 20px; }
+.scenario-payment { border-top: 1px solid #cfdee4; padding: 12px 0; }
+.scenario-payment > p { margin: 5px 0; }
+.scenario-production-confirmation { display: block; margin-block: 14px; padding: 12px; background: #fff4d9; color: #66491b; line-height: 1.6; }
+.scenario-production-confirmation input { margin-right: 8px; }
 .demo-site.expanded { position: fixed; inset: 0; height: 100dvh; min-height: 0; z-index: 80; background: #0d171e; overflow: auto; }
 .demo-site.expanded .demo-site-header, .demo-site.expanded .demo-site-footer { display: none; }
 .demo-site.expanded > main { min-height: 580px; }

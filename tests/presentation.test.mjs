@@ -34,3 +34,27 @@ test("initial presentation shows the system and keeps supplementary content clos
     await server.close();
   }
 });
+
+test("cash reference keeps paid orders visibly pending physical delivery", async () => {
+  const server = await createServer({
+    server: { middlewareMode: true, hmr: false, watch: null },
+    optimizeDeps: { noDiscovery: true, include: [] },
+    appType: "custom",
+    logLevel: "error",
+  });
+  try {
+    const { CashDetail } = await server.ssrLoadModule("/src/DesktopDetails.tsx");
+    const html = renderToStaticMarkup(createElement(CashDetail, { record: {
+      id: "paid", cells: ["PED-DEMO-0199", "Estudio Prisma", "C$ 4,600.00", "C$ 0.00"],
+      title: "Pagado · Pendiente de entrega",
+      facts: [["Pagado", "C$ 4,600.00"], ["Saldo", "C$ 0.00"], ["Entregado", "12 de 20 unidades"], ["Pendiente de entregar", "8 unidades"]],
+    } }));
+    assert.match(html, /Pagado · Pendiente de entrega/);
+    assert.match(html, /Entrega física pendiente/);
+    assert.match(html, /12 de 20 unidades/);
+    assert.match(html, /Pendiente: 8 unidades/);
+    assert.match(html, /Saldo<\/span><strong>C\$ 0.00/);
+  } finally {
+    await server.close();
+  }
+});

@@ -50,7 +50,7 @@ const moduleGuide: Record<GuideModuleId, { label: string; purpose: string; secon
   calculadora: { label: "Calculadora de costos", purpose: "Prueba cantidades, margen o precio con tarifas de ejemplo sin crear documentos.", secondary: true },
   panel: { label: "Panel principal", purpose: "El flujo diario reúne prioridades, entregas, saldos y alertas." },
   metricas: { label: "Métricas", purpose: "El resumen ejecutivo conecta ventas, cobros, gastos y saldos sin revelar reglas internas." },
-  ventas: { label: "Ventas", purpose: "La lista conserva juntos el pedido, su entrega, el estado y el total." },
+  ventas: { label: "Ventas", purpose: "Selecciona un pedido a la izquierda para revisar sus acciones, cobro, entrega y conceptos en el panel de detalle." },
   caja: { label: "Caja", purpose: "El panel de detalle explica el saldo antes de registrar un abono." },
   produccion: { label: "Producción", purpose: "La ficha lateral reúne proceso, cantidad, tiempo y materiales." },
   clientes: { label: "Clientes", purpose: "La ficha reúne el contacto, destinos y condiciones comerciales." },
@@ -77,8 +77,8 @@ const contentSteps: Record<GuideModuleId, GuideStep[]> = {
     { target: "workflow-columns", title: "Flujo operativo", message: "Los trabajos avanzan visualmente de Por hacer a Por entregar y Hecho hoy." },
   ],
   metricas: [
-    { target: "module-metrics", title: "Indicadores ejecutivos", message: "Cinco tarjetas sintetizan ventas, cobros, gastos, utilidad estimada y cartera." },
-    { target: "record-list", title: "Evolución semanal", message: "Las columnas comparan el avance del mes con valores completamente ficticios." },
+    { target: "module-metrics", title: "Indicadores ejecutivos", message: "Cinco tarjetas sintetizan ventas, cobros, gastos, resultado operativo y cartera." },
+    { target: "record-list", title: "Evolución diaria", message: "Las columnas comparan ventas por día con valores completamente ficticios." },
     { target: "record-detail", title: "Líderes comerciales", message: moduleGuide.metricas.purpose },
   ],
   ventas: [
@@ -88,7 +88,7 @@ const contentSteps: Record<GuideModuleId, GuideStep[]> = {
   ],
   caja: [
     { target: "module-metrics", title: "Resumen de caja", message: "Los importes separan cobros del día, saldos y movimientos por verificar." },
-    { target: "workspace-tabs", title: "Pendientes y movimientos", message: "Las dos vistas internas distinguen lo que falta cobrar de lo ocurrido hoy." },
+    { target: "workspace-tabs", title: "Pendientes y movimientos", message: "Los filtros distinguen pedidos por cobrar, pendientes, pagados e historial de hoy." },
     { target: "record-detail", title: "Composición del saldo", message: moduleGuide.caja.purpose },
   ],
   produccion: [

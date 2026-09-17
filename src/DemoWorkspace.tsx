@@ -5,7 +5,10 @@ import InteractiveGuide, { type GuideModuleId } from "./InteractiveGuide";
 import InternalViewContent, { type AdministrationViewId, type CatalogViewId } from "./InternalViews";
 import { useDemoSession } from "./DemoSession";
 import DemoControls from "./DemoControls";
-import { AvailabilityExample, CashExample, CostCalculatorExample, CustomerItemsExample, CustomersExample, DeliveriesExample, FinanceExample, InventoryExample, ProductionExample, QualityExample, QuotesExample, SalesExample } from "./OperationalModules";
+import { AvailabilityExample, CashExample, CostCalculatorExample, CustomerItemsExample, CustomersExample, DeliveriesExample, FinanceExample, InventoryExample, ProductionExample, QualityExample, QuotesExample } from "./OperationalModules";
+import { PurchasesExample } from "./PurchasesExample";
+import { ReferenceActions, ReferenceField, ReferenceTable } from "./DesktopPrimitives";
+import { SalesExample } from "./SalesExample";
 import ScenarioModule, { scenarioModules } from "./ScenarioModule";
 import DemoDialog from "./DemoDialog";
 import { Facts } from "./DemoPrimitives";
@@ -111,6 +114,7 @@ function ViewHeader({ title, subtitle, action, actions }: { title: string; subti
 }
 
 function PanelModule() {
+  const [area, setArea] = useState("Todas las áreas");
   const metrics = [
     ["Pedidos activos", "18", "neutral"],
     ["Pedidos atrasados", "2", "danger"],
@@ -154,15 +158,15 @@ function PanelModule() {
         ))}
       </div>
       <div className="flow-toolbar" data-guide-target="flow-toolbar">
-        <div><h3>Flujo operativo</h3><select aria-label="Área del flujo" defaultValue="todas"><option value="todas">Todas las áreas</option></select></div>
+        <div><h3>Flujo operativo</h3><select aria-label="Área del flujo" value={area} onChange={event => setArea(event.target.value)}>{["Todas las áreas", "Pedidos", "Producción", "Entregas", "Cobros", "Inventario"].map(label => <option key={label}>{label}</option>)}</select></div>
         <button className="real-primary-button" type="button" disabled>Abrir seleccionado</button>
       </div>
       <div className="workflow-columns" data-guide-target="workflow-columns">
         {columns.map((column) => (
           <section className={`workflow-column workflow-${column.tone}`} key={column.title}>
-            <header><strong>{column.title}</strong><span>{column.count}</span></header>
+            <header><strong>{column.title}</strong><span>{column.rows.filter(row => area === "Todas las áreas" || row[2].startsWith(area === "Entregas" ? "Entrega" : area === "Cobros" ? "Cobro" : area)).length}</span></header>
             <div className="workflow-body">
-              {column.rows.map(([reference, customer, detail, time]) => (
+              {column.rows.filter(row => area === "Todas las áreas" || row[2].startsWith(area === "Entregas" ? "Entrega" : area === "Cobros" ? "Cobro" : area)).map(([reference, customer, detail, time]) => (
                 <article className="workflow-row" key={reference}>
                   <div><strong>{reference}</strong><span> · Operación demo</span></div>
                   <h4>{customer}</h4><p>{detail}</p><small>{time}</small>
@@ -172,85 +176,58 @@ function PanelModule() {
           </section>
         ))}
       </div>
-      <div className="view-footnote"><span>Datos ficticios para demostración</span><span>Actualizado: 19/07/2026 10:45</span></div>
+      <div className="view-footnote"><span>Datos ficticios para demostración</span><span>Datos de ejemplo · Septiembre 2026</span></div>
     </div>
   );
 }
 
 function MetricsModule() {
   const weeklySales = [
-    { label: "Sem. 1", amount: "C$ 46,800", height: 46 },
-    { label: "Sem. 2", amount: "C$ 63,420", height: 67 },
-    { label: "Sem. 3", amount: "C$ 82,150", height: 88 },
-    { label: "Sem. 4", amount: "C$ 58,900", height: 61 },
+    { label: "01/09", amount: "C$ 46,800", height: 46 },
+    { label: "02/09", amount: "C$ 63,420", height: 67 },
+    { label: "03/09", amount: "C$ 82,150", height: 88 },
+    { label: "04/09", amount: "C$ 58,900", height: 61 },
   ];
   const leaders = [
-    ["Camiseta promocional", "C$ 58,300", "28 %"],
-    ["Taza personalizada", "C$ 41,950", "20 %"],
-    ["Diseño e impresión", "C$ 33,680", "16 %"],
+    ["Camiseta promocional", "C$ 58,300", "23.2 %"],
+    ["Taza personalizada", "C$ 41,950", "16.7 %"],
+    ["Diseño e impresión", "C$ 33,680", "13.4 %"],
   ];
   const expenses = [
     ["Insumos de producción", "C$ 37,400", "44 %"],
-    ["Servicios operativos", "C$ 21,850", "26 %"],
-    ["Logística", "C$ 12,600", "15 %"],
+    ["Servicios operativos", "C$ 21,850", "25.7 %"],
+    ["Logística", "C$ 12,600", "14.8 %"],
   ];
 
   return (
     <div className="real-module executive-metrics-real">
       <ViewHeader title="Métricas" subtitle="Indicadores comerciales y financieros para la toma de decisiones." action="Actualizar" />
+      <div className="desktop-period"><strong>Período</strong><ReferenceField label="Desde" value="01/09/2026" /><ReferenceField label="Hasta" value="30/09/2026" /><ReferenceField label="Vista" value="Devengado" /><ReferenceActions labels={["Hoy", "Mes actual", "Aplicar período"]} /></div>
       <div className="executive-kpis" data-guide-target="module-metrics">
-        <article><span>VENTAS DEL MES</span><strong>C$ 251,270</strong><small>34 documentos activos</small></article>
-        <article className="positive"><span>COBRADO</span><strong>C$ 186,420</strong><small>74 % de lo emitido</small></article>
-        <article className="negative"><span>GASTOS REGISTRADOS</span><strong>C$ 84,910</strong><small>Información ilustrativa</small></article>
-        <article className="positive"><span>UTILIDAD BRUTA EST.</span><strong>C$ 166,360</strong><small>Sin revelar fórmulas reales</small></article>
+        <article><span>VENTAS DEL PERÍODO</span><strong>C$ 251,270</strong><small>34 documentos activos</small></article>
+        <article className="positive"><span>COBROS NETOS</span><strong>C$ 186,420</strong><small>74 % de lo emitido</small></article>
+        <article className="negative"><span>GASTOS DEVENGADOS</span><strong>C$ 84,910</strong><small>Información ilustrativa</small></article>
+        <article className="positive"><span>RESULTADO OPERATIVO</span><strong>C$ 166,360</strong><small>Resultado del período de ejemplo</small></article>
         <article className="warning"><span>POR COBRAR</span><strong>C$ 64,850</strong><small>6 documentos abiertos</small></article>
       </div>
       <div className="executive-panels">
         <section className="executive-card weekly-card" data-guide-target="record-list">
-          <h3>Ventas por semana</h3>
+          <h3>Ventas por día</h3>
           <div className="weekly-chart">
             {weeklySales.map((item) => <div className="weekly-column" key={item.label}><small>{item.amount}</small><div><span style={{ height: `${item.height}%` }} /></div><b>{item.label}</b></div>)}
           </div>
         </section>
         <section className="executive-card ranking-card" data-guide-target="record-detail">
           <h3>Productos y servicios líderes</h3>
-          {leaders.map(([label, amount, percent]) => <div className="ranking-row" key={label}><div><strong>{label}</strong><span>{amount}</span></div><div className="ranking-track"><span style={{ width: percent }} /></div><small>{percent} de ventas</small></div>)}
+          {leaders.map(([label, amount, percent]) => <div className="ranking-row" key={label}><div><strong>{label}</strong><span>{amount}</span></div><div className="ranking-track"><span style={{ width: percent.replace(" ", "") }} /></div><small>{percent} de ventas</small></div>)}
         </section>
         <section className="executive-card ranking-card expense-card">
           <h3>Gastos por categoría</h3>
-          {expenses.map(([label, amount, percent]) => <div className="ranking-row" key={label}><div><strong>{label}</strong><span>{amount}</span></div><div className="ranking-track"><span style={{ width: percent }} /></div><small>{percent} del gasto</small></div>)}
+          {expenses.map(([label, amount, percent]) => <div className="ranking-row" key={label}><div><strong>{label}</strong><span>{amount}</span></div><div className="ranking-track"><span style={{ width: percent.replace(" ", "") }} /></div><small>{percent} del gasto</small></div>)}
         </section>
       </div>
-      <div className="view-footnote"><span>Valores sintéticos · sin cálculos del producto real</span><span>Actualizado: 20/07/2026 14:40</span></div>
-    </div>
-  );
-}
-
-function PurchasesModule() {
-  const rows = [
-    ["COM-DEMO-028", "Suministros Pacífico", "23/07/2026", "65 %", "C$ 18,460", "NIO"],
-    ["COM-DEMO-025", "Textiles Centro", "20/07/2026", "20 %", "C$ 31,800", "NIO"],
-    ["COM-DEMO-021", "Importadora Horizonte", "19/07/2026", "80 %", "US$ 640", "USD"],
-  ];
-  return (
-    <div className="real-module purchases-real">
-      <header className="purchases-header" data-guide-target="module-header">
-        <div><h2>Compras</h2><p>Facturas, abastecimiento y recepciones de mercancía.</p></div>
-        <div className="purchases-actions"><button type="button" disabled>Reporte de compras</button><button type="button" disabled>Plantilla</button><button type="button" disabled>Importar líneas</button><span /><button className="primary" type="button" disabled>Nueva compra</button></div>
-      </header>
-      <div className="purchase-kpis" data-guide-target="module-metrics">
-        <article><span>Compras abiertas</span><strong>7</strong><small>Pendientes de recepción</small></article>
-        <article className="late"><span>Atrasadas</span><strong>2</strong><small>Superaron fecha esperada</small></article>
-        <article className="pending"><span>Valor por recibir</span><strong>C$ 86,740</strong><small>No sustituye el saldo en CxP</small></article>
-      </div>
-      <div className="purchase-workspace">
-        <section>
-          <div className="real-filterbar" data-guide-target="module-filter"><div className="fake-input">Buscar compra o proveedor…</div><select defaultValue="abiertas" aria-label="Estado de compra"><option value="abiertas">Abiertas</option></select></div>
-          <div className="purchase-table" data-guide-target="record-list"><div className="purchase-row head"><span>Compra</span><span>Proveedor</span><span>Esperada</span><span>Progreso</span><span>Total</span><span>Mon.</span></div>{rows.map((row, index) => <div className={`purchase-row${index === 0 ? " selected" : ""}`} key={row[0]}>{row.map((cell) => <span key={cell}>{cell}</span>)}</div>)}</div>
-          <div className="view-footnote"><span>3 compras ficticias</span><span>Página 1 de 1</span></div>
-        </section>
-        <aside className="detail-pane purchase-detail" data-guide-target="record-detail"><small>COMPRA SELECCIONADA</small><h3>COM-DEMO-028</h3><p>Suministros Pacífico · Documento ilustrativo</p><div className="detail-list"><div><span>Estado</span><strong>Recepción parcial</strong></div><div><span>Esperada</span><strong>23/07/2026</strong></div><div><span>Total</span><strong>C$ 18,460</strong></div><div><span>Pendiente</span><strong>35 %</strong></div></div><div className="purchase-progress"><span style={{ width: "65%" }} /></div><button className="real-primary-button" type="button" disabled>Inspeccionar y recibir</button></aside>
-      </div>
+      <section className="executive-card desktop-profit"><h3>Rentabilidad comercial y productiva</h3><ReferenceTable headers={["Cliente", "Ingreso por conceptos", "Costo reconocido", "Ganancia bruta", "Margen"]} rows={[["Café Lumbre", "C$ 3,000.00", "C$ 1,680.00", "C$ 1,320.00", "44 %"], ["Norte Creativo", "C$ 4,350.00", "C$ 2,895.00", "C$ 1,455.00", "33.4 %"]]} /></section>
+      <div className="view-footnote"><span>Valores sintéticos · sin cálculos del producto real</span><span>Período de ejemplo · Septiembre 2026</span></div>
     </div>
   );
 }
@@ -265,15 +242,15 @@ function InternalModule({ id, administrationView, catalogView, onAdministrationV
   </div>;
 }
 
-function ModuleContent({ active, administrationView, catalogView, onAdministrationViewChange, onCatalogViewChange }: { active: ModuleId; administrationView: AdministrationViewId; catalogView: CatalogViewId; onAdministrationViewChange: (view: AdministrationViewId) => void; onCatalogViewChange: (view: CatalogViewId) => void }) {
+function ModuleContent({ active, administrationView, catalogView, onAdministrationViewChange, onCatalogViewChange, onNewSalesExample }: { onNewSalesExample: () => void; active: ModuleId; administrationView: AdministrationViewId; catalogView: CatalogViewId; onAdministrationViewChange: (view: AdministrationViewId) => void; onCatalogViewChange: (view: CatalogViewId) => void }) {
   if (active === "panel") return <PanelModule />;
   if (active === "metricas") return <MetricsModule />;
-  if (active === "ventas") return <SalesExample />;
+  if (active === "ventas") return <SalesExample onNewExample={onNewSalesExample} />;
   if (active === "caja") return <CashExample />;
   if (active === "produccion") return <ProductionExample />;
   if (active === "clientes") return <CustomersExample />;
   if (active === "finanzas") return <FinanceExample />;
-  if (active === "compras") return <PurchasesModule />;
+  if (active === "compras") return <PurchasesExample />;
   if (active === "inventario") return <InventoryExample />;
   if (active === "cotizaciones") return <QuotesExample />;
   if (active === "entregas") return <DeliveriesExample />;
@@ -304,7 +281,10 @@ export default function DemoWorkspace({ expanded, expandButtonRef, onToggleExpan
   const guideButtonRef = useRef<HTMLButtonElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const [pan, setPan] = useState({ overflow: false, left: false, right: false });
-  const visiblePrimary = primaryModules.filter((module) => state.mode !== "simple" || (module.id !== "produccion" && module.id !== "entregas"));
+  const simpleNavigation: ModuleId[] = ["panel", "metricas", "clientes", "ventas", "caja", "disponibilidad"];
+  const visiblePrimary = state.mode === "simple"
+    ? primaryModules.filter((module) => simpleNavigation.includes(module.id)).sort((a, b) => simpleNavigation.indexOf(a.id) - simpleNavigation.indexOf(b.id))
+    : primaryModules;
   const selectableModules = [...visiblePrimary, ...secondaryModules];
 
   useLayoutEffect(() => {
@@ -435,7 +415,7 @@ export default function DemoWorkspace({ expanded, expandButtonRef, onToggleExpan
         </aside>
 
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">Módulo visible: {moduleCopy[active].title}.</p>
-        <section ref={contentRef} className={`app-content real-app-content${active === "administracion" || active === "catalogo" ? " internal-module-content" : ""}`} data-guide-target="module-surface" data-active-submenu={active === "administracion" ? administrationView : active === "catalogo" ? catalogView : undefined}>{followingScenario && scenarioModules.has(active) ? <ScenarioModule key={active} active={active} onNavigate={navigate} /> : <ModuleContent active={active} administrationView={administrationView} catalogView={catalogView} onAdministrationViewChange={showAdministrationView} onCatalogViewChange={showCatalogView} />}</section>
+        <section ref={contentRef} className={`app-content real-app-content${active === "administracion" || active === "catalogo" ? " internal-module-content" : ""}`} data-guide-target="module-surface" data-active-submenu={active === "administracion" ? administrationView : active === "catalogo" ? catalogView : undefined}>{followingScenario && scenarioModules.has(active) ? <ScenarioModule key={active} active={active} onNavigate={navigate} /> : <ModuleContent onNewSalesExample={() => { dispatch({ type: "reset" }); dispatch({ type: "approve" }); setFollowingScenario(true); navigate("ventas"); }} active={active} administrationView={administrationView} catalogView={catalogView} onAdministrationViewChange={showAdministrationView} onCatalogViewChange={showCatalogView} />}</section>
 
         <footer className="app-statusbar real-statusbar" data-guide-target="status-bar"><span><i /> {followingScenario ? "Pedido de ejemplo" : "Explorar pantallas"}</span><strong>InkGestión</strong></footer>
         <InteractiveGuide active={active} open={guideOpen} onClose={closeGuide} workspaceRef={workspaceRef} />

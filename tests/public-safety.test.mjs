@@ -177,24 +177,25 @@ test("provides distinct internal screens and an accessible contextual guide", ()
 
 test("includes the current metrics and purchases presentation as read-only synthetic views", () => {
   const workspace = readFileSync("src/DemoWorkspace.tsx", "utf8");
+  const purchases = readFileSync("src/PurchasesExample.tsx", "utf8");
   const internalViews = readFileSync("src/InternalViews.tsx", "utf8");
 
   for (const label of [
-    "Ventas del mes", "Cobrado", "Gastos registrados", "Utilidad bruta est.", "Por cobrar",
-    "Ventas por semana", "Productos y servicios líderes", "Gastos por categoría",
+    "Ventas del período", "Cobros netos", "Gastos devengados", "Resultado operativo", "Por cobrar",
+    "Ventas por día", "Productos y servicios líderes", "Gastos por categoría",
   ]) {
     assert.match(workspace, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "iu"), `Missing executive metric: ${label}`);
   }
 
   for (const label of [
     "Reporte de compras", "Plantilla", "Importar líneas", "Nueva compra",
-    "Compras abiertas", "Atrasadas", "Valor por recibir", "Pendientes de recepción",
+    "Compras abiertas", "Atrasadas", "Valor por recibir", "Recepciones",
     "COMPRA SELECCIONADA", "Inspeccionar y recibir",
   ]) {
-    assert.match(workspace, new RegExp(label, "u"), `Missing redesigned purchases detail: ${label}`);
+    assert.match(purchases, new RegExp(label, "u"), `Missing redesigned purchases detail: ${label}`);
   }
 
-  assert.match(workspace, /className="purchase-workspace"/u);
+  assert.match(purchases, /<RecordExplorer layout="workspace"/u);
   assert.match(workspace, /data-guide-target="record-list"/u);
   assert.match(workspace, /data-guide-target="record-detail"/u);
   assert.match(internalViews, /title="Métricas de ventas"/u);
@@ -280,7 +281,7 @@ test("keeps the demo scope available on demand without a marketing landing page"
   const app = readFileSync("src/App.tsx", "utf8");
   for (const notice of [
     "Demo del sistema de escritorio · Datos ficticios", "Acerca de esta demo",
-    "Referencia del sistema · 1.10.3", "Sin conexión al producto comercial",
+    "Referencia visual del sistema · 1.10.6", "Sin conexión al producto comercial",
     "Impresión física, permisos, respaldos y trabajo multiusuario",
     "demostración del sistema instalado",
   ]) {

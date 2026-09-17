@@ -4,6 +4,8 @@ import App from "./App";
 import "./globals.css";
 import "./demo-fidelity.css";
 import "./demo-shell.css";
+import "./sales-example.css";
+import "./desktop-views.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

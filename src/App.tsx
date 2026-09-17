@@ -60,7 +60,7 @@ export default function App() {
         onClose={() => setInformation(null)}
       >
         {information === "views" ? <AuxiliaryViews /> : <div className="demo-about">
-          <p className="demo-about-version">Referencia del sistema · 1.10.3</p>
+          <p className="demo-about-version">Referencia visual del sistema · 1.10.6</p>
           <p>Recreación web de la aplicación de escritorio. Los registros son ficticios y las acciones habilitadas solo cambian el ejemplo.</p>
           <dl>
             <div><dt>Explorar pantallas</dt><dd>Consulta los módulos y sus registros de muestra. La vista completa reúne funciones cuyo acceso depende de la edición contratada, la configuración y los permisos. Las ediciones del producto son Comercial, Operaciones e Integral.</dd></div>

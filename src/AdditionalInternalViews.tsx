@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DemoPage, DemoTabs, Facts, PreviewButton, RecordExplorer, type ExampleRecord } from "./DemoPrimitives";
+import { ReferenceActions, ReferenceField, ReferenceHeading, ReferenceTable } from "./DesktopPrimitives";
 
 export type ExtraCatalogId = "atributos" | "familias" | "acciones" | "personalizacion";
 export type ExtraAdministrationId = "cajas" | "auditoria" | "diseno" | "inicio";
@@ -34,7 +35,12 @@ export default function AdditionalInternalViews({ view }: { view: ExtraCatalogId
   if (view === "diseno") return <DesignExample />;
   if (view === "inicio") return <SetupExample />;
   const definition = screens[view];
-  return <DemoPage title={definition.title} description={definition.description}><RecordExplorer key={view} headers={definition.headers} records={definition.records} detailTitle="DETALLE SELECCIONADO" actions={<PreviewButton>{definition.action}</PreviewButton>} /></DemoPage>;
+  return <DemoPage title={definition.title} description={definition.description}><RecordExplorer layout="workspace" key={view} headers={definition.headers} records={definition.records} detailTitle="DETALLE SELECCIONADO" renderDetail={record => <>
+    <ReferenceHeading title={record.title} subtitle={record.cells[0]} />
+    {view === "auditoria" ? <Facts items={record.facts} /> : <div className="desktop-field-grid">{record.facts.map(([label, value]) => <ReferenceField key={label} label={label} value={value} />)}</div>}
+    {view === "familias" && <ReferenceTable title="Variantes de muestra" headers={["Código", "Talla", "Color", "Estado"]} rows={[["PRO-DEMO-027-S", "S", "Blanco", "Activa"], ["PRO-DEMO-027-M", "M", "Negro", "Activa"]]} />}
+    <ReferenceActions labels={["Descartar", definition.action]} primary={definition.action} />
+  </>} /></DemoPage>;
 }
 
 function DesignExample() {

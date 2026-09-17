@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import AdditionalInternalViews, { type ExtraAdministrationId, type ExtraCatalogId } from "./AdditionalInternalViews";
 import DemoControls from "./DemoControls";
-import { StationExamples, CatalogProductExtras } from "./StationExamples";
+import CatalogProducts from "./CatalogProducts";
+import { StationExamples } from "./StationExamples";
 
 export type AdministrationViewId = ExtraAdministrationId | "empresa" | "usuarios" | "roles" | "equipos" | "metricas-ventas" | "estacion" | "respaldos";
 export type CatalogViewId = ExtraCatalogId | "productos" | "categorias" | "unidades" | "recetas" | "proveedores";
@@ -229,18 +230,8 @@ function BackupsView() {
 }
 
 function ProductsView() {
-  const rows: ReactNode[][] = [
-    [<strong>PRO-DEMO-032</strong>, "Taza personalizada 11 oz", "Producto", "Unidad", <Badge tone="success">Activo</Badge>],
-    [<strong>SER-DEMO-014</strong>, "Diseño para impresión", "Servicio", "Servicio", <Badge tone="success">Activo</Badge>],
-    [<strong>PRO-DEMO-027</strong>, "Camiseta promocional", "Producto", "Unidad", <Badge tone="success">Activo</Badge>],
-  ];
-  return (
-    <Screen section="CATÁLOGO" title="Productos y servicios" description="Conceptos comerciales, costos y precios vigentes." actions={<div className="internal-screen-actions"><DemoButton>Plantilla</DemoButton><DemoButton>Importar</DemoButton><DemoButton primary>Nuevo concepto</DemoButton></div>}>
-      <div className="internal-screen-grid product-grid"><section><div className="fake-input internal-search">Buscar código o nombre…</div><div className="catalog-filter-row"><Badge tone="success">Activos</Badge><Badge>Inactivos</Badge><Badge>Todos</Badge><span /><Badge>Producto</Badge><Badge>Servicio</Badge><Badge>Cargo</Badge></div><Table headers={["Código", "Nombre", "Tipo", "Unidad", "Activo"]} rows={rows} /></section><aside className="internal-card internal-editor" data-guide-target="record-detail"><div className="internal-card-heading"><div><h3>Taza personalizada 11 oz</h3><p className="internal-copy">PRO-DEMO-032 · Producto ficticio seleccionado</p></div><DemoButton>Editar</DemoButton></div><div className="internal-field-grid"><Field label="Categoría" value="Promocionales" /><Field label="Unidad" value="Unidad" /><Field label="Costo estimado" value="C$ 78.00" /><Field label="Precio público" value="C$ 145.00" /><Field label="Características" value="Inventario · Personalizable" wide /></div><h4 className="permission-heading">Presentaciones</h4><Table headers={["Presentación", "Unidad", "Factor", "Pred."]} rows={[["Caja DEMO", "UND", "12.0000", "Sí"], ["Unidad", "UND", "1.0000", "No"]]} /></aside></div>
-    <CatalogProductExtras /></Screen>
-  );
+  return <Screen section="CATÁLOGO" title="Productos y servicios" description="Conceptos comerciales, costos y precios vigentes."><CatalogProducts /></Screen>;
 }
-
 function CategoriesView() {
   const rows: ReactNode[][] = [
     [<strong>CAT-DEMO-01</strong>, "Promocionales", <Badge tone="success">Activa</Badge>],

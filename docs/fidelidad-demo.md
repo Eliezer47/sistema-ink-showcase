@@ -112,3 +112,39 @@ La demo sirve como recorrido orientativo de las funciones y del flujo mostrado. 
 La validación visual exacta, formatos de impresión, operación multiusuario, permisos efectivos, instalación y restauración siguen pendientes de una demostración de la entrega comercial. Esta revisión no elimina esa limitación ni constituye una garantía de equivalencia completa.
 
 **Publicación:** consulta `version-publicable.md` para identificar la entrega alojada y sus verificaciones. La comparación anterior describe el código revisado; el registro de publicación permite comprobar qué versión está disponible para los prospectos.
+
+## Ajuste visual de Ventas — Captura del 15/09/2026
+
+La captura del producto aportada por el usuario muestra **Ventas rápidas en modo Simple**, con una lista compacta a la izquierda y un panel principal de detalle a la derecha. La revisión anterior había mejorado filtros y comportamiento, pero seguía utilizando una ficha genérica y no reproducía esa distribución.
+
+Se sustituyó la presentación de Ventas por una vista específica: encabezado con modo Simple, acceso a documentos y nueva venta; búsqueda, cuatro filtros y rango de fechas; pedido seleccionado, barra de acciones, siguiente paso, cliente, total/pagado/saldo, fechas y conceptos confirmados. La distribución también se conserva en Por áreas, con sus textos correspondientes. Los nombres y contactos de la captura no se incorporaron: todos los registros son ficticios.
+
+La selección, búsqueda y fechas funcionan; resúmenes y etiquetas muestran el pedido elegido. Cobro completo en efectivo, entrega de pendientes y cambio de fecha son ejemplos abreviados que solo cambian esta vista y se restablecen al salir de Ventas o recargar. Nueva venta abre la cotización preparada del recorrido existente para confirmar la venta y practicar los pasos de cobro. Los menús de cancelación, cuentas e impresión presentan referencias de muestra; no ejecutan cancelaciones, pagos, impresiones ni envíos reales. Las opciones completas de esos menús requieren referencias adicionales del producto.
+
+No se copiaron fuentes comerciales, contratos, estructuras internas ni datos reales. Esta mejora usa componentes de presentación y ejemplos independientes. La captura valida la distribución visible; no acredita equivalencia completa de formularios o flujos que no aparecen en ella.
+
+Comprobación: compilación y 33 pruebas aprobadas; ocho recorridos agrupados de navegador verificaron selección y documentos, filtros y búsqueda vacía, cobro, entrega con saldo, cambio de fecha, nueva venta y navegación móvil. Presentación inspeccionada a 1600 × 900 y 390 × 844; el detalle ocupa aproximadamente dos tercios del área de Ventas. Sin errores de aplicación ni solicitudes externas propias de la demo. Evidencia y capturas locales: `work/sales-review/`.
+
+Este ajuste está en el proyecto local. No forma parte de la entrega `057815b25c4c` publicada anteriormente; el registro de publicación debe actualizarse cuando se cargue una nueva entrega.
+
+## Extensión visual de las demás áreas — 16/09/2026
+
+La referencia visual de esta revisión es Sistema Ink **1.10.6**, disponible en el proyecto local al realizarla. Se consultaron las definiciones de interfaz en modo lectura, sin ejecutar la aplicación comercial ni copiar su código a la web. La revisión funcional anterior contra 1.10.3 sigue siendo un antecedente; el cambio de referencia visual no certifica equivalencia funcional completa con 1.10.6.
+
+Cambios locales, adicionales al ajuste previo de Ventas:
+
+- Caja: lista de pedidos y panel de cobro, métodos de pago, totales, transferencias por verificar e historial de recibos. Un pedido pagado mantiene visible su entrega pendiente.
+- Producción: búsqueda y selector de estado, trabajo seleccionado, materiales previstos/reales y sesiones.
+- Entregas y Despachos: cantidades por concepto, receptor y fecha, historial, pedidos agrupados y costo del transporte.
+- Compras e Inventario: recepción parcial, cantidades y costo puesto, existencias por almacén, conteos y kardex.
+- Cotizaciones, Clientes, Artículos del cliente y Calidad: formularios y tablas propios de cada área, con detalles coherentes con la fila seleccionada.
+- Finanzas: siete secciones con detalles de cartera, pagos, cuotas, cuentas, informes, activos y presupuesto.
+- Catálogo: listado completo con búsqueda y filtros; abrir una ficha y volver al listado; precios, características y presentaciones. Conserva la vista de promociones de la taza de muestra.
+- Administración y subsecciones de Catálogo: campos, tablas, espacios y botones ajustados a la presentación de escritorio.
+- Panel y Métricas: filtro por área, período, nombres actuales de indicadores, gráfica diaria y rentabilidad. F3 presenta una tabla de disponibilidad con búsqueda y almacén combinados.
+
+La implementación sigue siendo independiente y usa datos ficticios. Los cambios de pantalla, búsqueda, filtros y selección funcionan localmente; los controles operativos de las vistas de referencia permanecen deshabilitados. Las operaciones de muestra se prueban en el recorrido «Seguir un pedido». No se incorporaron conexiones al producto, almacenamiento persistente, esquemas, servicios, fórmulas comerciales ni archivos originales.
+
+Validación: compilación TypeScript/Vite y **34 pruebas aprobadas**; diez comprobaciones agrupadas de las nuevas vistas, ocho de Ventas y nueve del recorrido completo en Chrome sin ventana. Sin errores de aplicación ni solicitudes externas propias. Se revisaron tamaños de escritorio, 1280 × 720 y móvil con desplazamiento de la interfaz de escritorio. Evidencia local excluida de publicación: `work/visual-review/`, `work/sales-review/` y `work/fidelity-review/`.
+
+Esta revisión reproduce la distribución y los controles visibles consultados; la escala, los permisos y la configuración de una instalación pueden cambiar su apariencia. No se ejecutó una comparación de capturas de todas las pantallas de la aplicación comercial. **Estos cambios están en la demo local; esta revisión no publica en GitHub ni en Hostinger.**
